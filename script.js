@@ -220,7 +220,7 @@ const HS_LIB = {
   }},
   chem: { core: {
     L1:[{title:"『鎌田の講義（理論/無機/有機）』+『宇宙1わかりやすい高校化学』", tags:["化学 基礎"], why:"用語と計算の橋渡し。", tip:"モル→濃度→反応式を図式化。"}],
-    L2:[{title:"『鎌田の講義（理論/無機/有機）』+", tags:["化学 標準"], why:"頻出テーマの網羅。", tip:"反応機構の“矢印”を自分で描く。"}],
+    L2:[{title:"『鎌田の講義（理論/無機/有機）』", tags:["化学 標準"], why:"頻出テーマの網羅。", tip:"反応機構の“矢印”を自分で描く。"}],
     L3:[{title:"『重要問題集（厳選）』＋分野別補強", tags:["化学 難関"], why:"有機/平衡/電池の深掘り。", tip:"グラフの意味を言語化。"}],
     L4:[{title:"過去問（志望大）＋演習ノート", tags:["化学 最難関"], why:"出題校の傾向対応。", tip:"誤答原因を“知識/計算/読解”に分類。"}],
   }},
@@ -334,9 +334,14 @@ function renderHsResults(subject, area){
 }
 
 function mapLevel(lbl){
-  if(lbl.includes("最難関")) return "L4";
-  if(lbl.includes("難関"))   return "L3";
-  if(lbl.includes("標準"))   return "L2";
+  if (!lbl) return "L1";
+  // 1) 最難関を最優先
+  if (lbl.includes("最難関")) return "L4";
+  // 2) 「標準」を先に判定（※「準難関」の“難関”に誤ヒットさせない）
+  if (lbl.includes("標準")) return "L2";
+  // 3) 「難関」ただし「準難関」を含む場合は除外
+  if (lbl.includes("難関") && !lbl.includes("準難関")) return "L3";
+  // 4) それ以外は基礎
   return "L1";
 }
 
@@ -415,4 +420,5 @@ async function copyResults(){
 }
 
 /* 初期表示 */
+
 draw();
