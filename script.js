@@ -120,7 +120,7 @@ const decisionTree = {
     ],
     "jhs-eng-vocab-standard": [
       {title:"『ターゲット1800』", tags:["標準単語"], why:"高校入門まで見据えた語彙力。", tip:"1周目見出し語→2周目派生語。"},
-      {title:"『1か月で1000語覚える本（中学英単語）』", tags:["加速記憶"], why:"短期集中で塊暗記。", tip:"朝/夜分割→週1スクリーニング。"}
+      {title:"『1か月で1000語覚えられる本（中学英単語）』", tags:["加速記憶"], why:"短期集中で塊暗記。", tip:"朝/夜分割→週1スクリーニング。"}
     ],
     "jhs-math-calc": [
       {title:"『計算トレーニング』", tags:["計算土台"], why:"符号・約分の取りこぼし矯正。", tip:"×は同型3問＋“ミス図鑑”。"}
@@ -153,7 +153,7 @@ const HS_LIB = {
     },
     grammar: {
       L1:[
-        {title:"Input：『世界一わかりやすい英文法』 or 『英文法POLARIS1』", tags:["文法L1"], why:"基礎を体系化。", tip:"15分インプット→要点口頭説明。"},
+        {title:"Input：『大岩のいちばんはじめの英文法』 or 『英文法POLARIS1』", tags:["文法L1"], why:"基礎を体系化。", tip:"15分インプット→要点口頭説明。"},
         {title:"Output：『Next Stage（基本〜基礎）』", tags:["演習"], why:"頻出文法/語法を即演習。", tip:"20問/回、根拠言語化。"}
       ],
       L2:[
@@ -422,3 +422,4 @@ async function copyResults(){
 /* 初期表示 */
 
 draw();
+
