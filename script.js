@@ -15,9 +15,9 @@ const decisionTree = {
     { id: "subject", type: "q", prompt: "科目は？", options: [
       {label:"英語", next:"jhs-eng-area"},
       {label:"数学", next:"jhs-math-area"},
-      {label:"国語（後日追加）", next:"todo"},
-      {label:"理科（後日追加）", next:"todo"},
-      {label:"社会（後日追加）", next:"todo"},
+      {label:"国語", next:"jhs-japanese-area"},
+      {label:"理科", next:"jhs-science-area"},
+      {label:"社会", next:"jhs-social-area"},
     ]},
 
     /* 英語 */
@@ -48,11 +48,30 @@ const decisionTree = {
       {label:"基礎的な入試対策", toResult:"jhs-math-basic-entrance"},
       {label:"標準的な入試対策", toResult:"jhs-math-standard-entrance"},
     ]},
+      /* 国語 */
+    { id: "jhs-japanese-area", type: "q", prompt: "どの分野？", options: [
+      {label:"漢字", toResult:"jhs-japanese-kanji"},
+      {label:"古文", toResult:"jhs-japanese-oldtext"},
+      {label:"作文", toResult:"jhs-japanese-basic-text"},
+      {label:"現代文", toResult:"jhs-japanese-standard-text"},
+    ]},
+      /* 理科 */
+    { id: "jhs-science-area", type: "q", prompt: "今のレベルは？", options: [
+      {label:"基礎的なインプット", toResult:"jhs-science-calc"},
+      {label:"基礎的な問題集", toResult:"jhs-science-text"},
+      {label:"標準的な入試対策", toResult:"jhs-science-standard-entrance"},
+    ]},
+      /* 社会 */
+    { id: "jhs-social-area", type: "q", prompt: "どの分野？", options: [
+      {label:"地理", toResult:"jhs-social-geograph"},
+      {label:"歴史", toResult:"jhs-social-history"},
+      {label:"公民", toResult:"jhs-social-citizen"},
+    ]},
 
     /* ===== 高校：学年→受験レベル→科目（高3限定科目は動的表示） ===== */
     { id: "hs-level", type: "q", prompt: "受験レベルは？", options: [
-      {label:"基礎（共通/中堅私大）", next:"hs-subject"},
-      {label:"標準（中堅〜準難関）", next:"hs-subject"},
+      {label:"基礎（共通）", next:"hs-subject"},
+      {label:"標準（中堅私大〜準難関）", next:"hs-subject"},
       {label:"難関（GMARCH/関関同立など）", next:"hs-subject"},
       {label:"最難関（早慶上理・旧帝など）", next:"hs-subject"},
     ]},
@@ -135,6 +154,39 @@ const decisionTree = {
     "jhs-math-standard-entrance": [
       {title:"『高校入試でよくでる数学』", tags:["入試標準"], why:"頻出良問で柱を作る。", tip:"時間測定→解法選択の理由を言語化。"}
     ],
+    "jhs-science-calc": [
+      {title:"『キーワードマスター』", tags:["用語暗記"], why:"用語をまずは暗記", tip:"図・表から確認。"}
+    ],
+    "jhs-science-text": [
+      {title:"『ホントにわかる中学3年間の総復習 理科』", tags:["教科書レベル"], why:"要点整理＋基礎問題で抜け漏れ防止。", tip:"毎回1単元→○付け後に図表まとめ。"}
+    ],
+    "jhs-science-standard-entrance": [
+      {title:"『中1・2の総復習』", tags:["入試標準"], why:"出題率の高い分野を重点演習。", tip:"分野ごとに制限時間を設定して解く。"}
+    ],
+    "jhs-social-geograph": [
+      {title:"『すっきり整理されているから、忘れない。白地図』", tags:["地理"], why:"地図と統計資料の読み取り練習。", tip:"白地図に書き込み→1分で再現。"},
+      {title:"『ホントにわかる中学3年間の総復習 社会』", tags:["地理"], why:"用語暗記＋図解理解で得点源化。", tip:"選択肢問題は理由付けを必ず口頭説明。"}
+    ],
+    "jhs-social-history": [
+      {title:"『すっきり整理されているから、忘れない。歴史年表』", tags:["歴史"], why:"時代の流れをつかむための通史確認。", tip:"年表を音読→穴埋めテスト。"},
+      {title:"『ホントにわかる中学3年間の総復習 社会』", tags:["歴史"], why:"用語暗記＋図解理解で得点源化。", tip:"選択肢問題は理由付けを必ず口頭説明。"}
+    ],
+    "jhs-social-citizen": [
+      {title:"『ホントにわかる中学3年間の総復習 社会』", tags:["公民"], why:"用語暗記＋図解理解で得点源化。", tip:"選択肢問題は理由付けを必ず口頭説明。"},
+      {title:"『キーワードマスター』", tags:["用語暗記"], why:"用語をまずは暗記", tip:"図・表から確認。"}
+    ],
+    "jhs-japanese-kanji": [
+      {title:"『漢検3級過去問集』", tags:["漢字"], why:"配点の割に差がつきやすい。", tip:"1日10問×音読→翌日再テスト。"}
+    ],
+    "jhs-japanese-oldtext": [
+      {title:"『くわしい問題集 国文法』", tags:["古文基礎"], why:"助動詞と敬語を一気に整理。", tip:"例文を音読→意味を口頭確認。"}
+    ],
+    "jhs-japanese-basic-text": [
+      {title:"『たった7日で超攻略 国語・作文』", tags:["作文"], why:"起承転結の型を習得。", tip:"授業内で添削→次回再提出。"}
+    ],
+    "jhs-japanese-standard-text": [
+      {title:"『WINPASS』or『読解トレーニング 基礎編』", tags:["現代文精読"], why:"設問根拠を文中から探す習慣付け。", tip:"本文に線を引いて根拠を見える化。"}
+    ]
   }
 };
 
