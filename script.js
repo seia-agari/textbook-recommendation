@@ -1,4 +1,4 @@
-/* ================== 中学生：既定（あなたの指定どおり） ================== */
+/* ================== 中学生：既定 ================== */
 const decisionTree = {
   start: "grade",
   nodes: [
@@ -57,7 +57,7 @@ const decisionTree = {
       {label:"最難関（早慶上理・旧帝など）", next:"hs-subject"},
     ]},
 
-    // 科目選択は draw() 内で「高3/既卒」以外は理社（物理/化学/生物/日史/世史）を非表示にします
+    // 科目選択は draw() 内で「高3/既卒」以外は理社（物/化/生/日史/世史）を非表示
     { id: "hs-subject", type: "q", prompt: "高校：科目は？", options: [
       {label:"英語", next:"hs-eng-area"},
       {label:"数学", next:"hs-math-area"},
@@ -77,7 +77,7 @@ const decisionTree = {
       {label:"リスニング", toResult:"HS/eng/listening"},
     ]},
 
-    /* ★ 数学の文言＆分岐を修正（入門問題精講・1対1/プラチカ排除） */
+    /* ★ 数学：文言＆分岐を刷新（入門問題精講、1対1/プラチカは候補から外す） */
     { id: "hs-math-area", type: "q", prompt: "数学の分野は？", options: [
       {label:"土台固め（教科書/チャート例題）", toResult:"HS/math/foundation"},
       {label:"入試基礎", toResult:"HS/math/basic"},
@@ -140,7 +140,7 @@ const decisionTree = {
 
 /* ================== 高校ライブラリ ==================
    L1: 基礎 / L2: 標準 / L3: 難関 / L4: 最難関
-   ★ 数学は要望通りに刷新（入門問題精講、1対1/プラチカ排除）
+   ★ 数学は要望通り刷新（“入門問題精講”、1対1/プラチカは除外）
    ★ 理社＆理科（物/化/生・日史/世史）は 高3/既卒 のときだけ選択可能
 */
 const HS_LIB = {
@@ -173,7 +173,7 @@ const HS_LIB = {
       L1:[{title:"『入門 英文解釈の技術70』", tags:["解釈L1"], why:"SVOCと基本構文を可視化。", tip:"SVOCマーキング→1分要約。"}],
       L2:[{title:"『英文解釈の技術100』 or 『基礎英文問題精講』", tags:["解釈L2"], why:"構文把握の精度UP。", tip:"チャンク読み→根拠明示。"}],
       L3:[{title:"『英文解釈の技術100』", tags:["解釈L3"], why:"難構文の処理を鍛える。", tip:"音読→再構文→別解検討。"}],
-      L4:[{title:"『ポレポレ英文法』", tags:["解釈L4"], why:"抽象度の高い論理展開に対応。", tip:"段落関係を図解→要旨一行化。"}],
+      L4:[{title:"『ポレポレ英文読解』", tags:["解釈L4"], why:"抽象度の高い論理展開に対応。", tip:"段落関係を図解→要旨一行化。"}],
     },
     reading: {
       L1:[{title:"『やっておきたい英語長文300』 or 『関先生の英語長文1』", tags:["長文L1"], why:"基礎レベルの処理速度。", tip:"設問先読み→根拠下線。"}],
@@ -244,30 +244,89 @@ const HS_LIB = {
   }},
 };
 
-/* ========== 状態 & UI描画 ========== */
-const state = { stack:[], current:decisionTree.start, lastResults:[], memo:{} };
+/* ========== 状態 & UI参照（DOMContentLoaded後に初期化） ========== */
 const $ = s => document.querySelector(s);
-const elStage=$("#stage"), elBar=$("#bar"), elCrumbs=$("#crumbs");
-$("#backBtn").addEventListener("click", back);
-$("#shareBtn").addEventListener("click", copyResults);
-$("#restartBtn").addEventListener("click", restartFromGrade);
-$("#resetTop").addEventListener("click", resetAll);
+let elStage, elBar, elCrumbs;
+const state = { stack:[], current:decisionTree.start, lastResults:[], memo:{} };
 
+/* === 学年ユーティリティ === */
+function isJHS(grade){ return ["中1","中2","中3"].includes(grade); }
+function isHS(grade){ return grade && grade.startsWith("高"); }
+function isHS3(grade){ return grade==="高3/既卒"; }
+function isHS1or2(grade){ return grade==="高1" || grade==="高2"; }
+
+/* === 進捗バー / パンくず === */
+function setProgress(){
+  if(!elBar) return;
+  const pct=Math.min(100,Math.round(((state.stack.length+1)/7)*100));
+  elBar.style.width=pct+"%";
+}
+function renderCrumbs(){
+  if(!elCrumbs) return;
+  elCrumbs.innerHTML="";
+  state.stack.forEach(s=>{
+    const d=document.createElement("span");
+    d.className="crumb";
+    d.textContent=s.label;
+    elCrumbs.appendChild(d);
+  });
+}
+
+/* === ノード取得 === */
 function findNode(id){ return decisionTree.nodes.find(n=>n.id===id); }
-function setProgress(){ const pct=Math.min(100,Math.round(((state.stack.length+1)/7)*100)); elBar.style.width=pct+"%"; }
-function renderCrumbs(){ elCrumbs.innerHTML=""; state.stack.forEach(s=>{ const d=document.createElement("span"); d.className="crumb"; d.textContent=s.label; elCrumbs.appendChild(d); }); }
 
+/* === レベル判定 & 学年キャップ === */
+function mapLevel(lbl){
+  if (!lbl) return "L1";
+  if (lbl.includes("最難関")) return "L4";
+  if (lbl.includes("標準")) return "L2";
+  if (lbl.includes("難関") && !lbl.includes("準難関")) return "L3";
+  return "L1";
+}
+function capLevelByGrade(level, grade){
+  // 高1・高2は L2 まで（表示も結果もキャップ）
+  if (isHS1or2(grade)) return (level==="L3"||level==="L4") ? "L2" : level;
+  return level;
+}
+
+/* === 画面描画 === */
 function draw(){
-  let node=findNode(state.current);
-  if(!node){ elStage.innerHTML=`<div class="empty">分岐が見つかりません。はじめからやり直してください。</div>`; return; }
+  const node=findNode(state.current);
+  if(!node || !elStage){
+    if(elStage) elStage.innerHTML=`<div class="empty">分岐が見つかりません。はじめからやり直してください。</div>`;
+    return;
+  }
 
-  // ★ 高3/既卒以外は理社・理科の選択肢を隠す
-  let opts=node.options;
-  if(node.id==="hs-subject"){
-    const isHS3 = (state.memo.grade==="高3/既卒");
-    opts = node.options.filter(o=>{
-      return isHS3 ? true : !(o.label.includes("（高3のみ）"));
+  let opts=[...(node.options||[])];
+  const grade = state.memo.grade;
+
+  /* --- 表示制御: 中学生の英語長文 --- */
+  if (node.id==="jhs-eng-reading" && isJHS(grade)) {
+    if (grade==="中1" || grade==="中2") {
+      // 中1・中2は「基礎」だけを表示
+      opts = opts.filter(o=>o.label==="基礎");
+    } // 中3は全表示
+  }
+
+  /* --- 表示制御: 中学生の数学 --- */
+  if (node.id==="jhs-math-area" && isJHS(grade)) {
+    opts = opts.filter(o=>{
+      if (o.label==="計算を身に付けたい" || o.label==="教科書レベルをできるようにしたい") return true;
+      if (o.label==="基礎的な入試対策") return grade==="中3";
+      if (o.label==="標準的な入試対策") return grade==="中3"; // 中3は標準的な入試対策もOK
+      return false;
     });
+  }
+
+  /* --- 表示制御: 高1・高2は受験レベルの選択肢を基礎/標準のみ --- */
+  if (node.id==="hs-level" && isHS1or2(grade)) {
+    opts = opts.filter(o => /基礎|標準/.test(o.label));
+  }
+
+  /* --- 表示制御: 高1・高2は理社/理科メニューを非表示（高3/既卒のみ表示） --- */
+  if (node.id==="hs-subject" && isHS(grade) && !isHS3(grade)) {
+    const allowed = ["英語","数学","国語"];
+    opts = opts.filter(o => allowed.includes(o.label));
   }
 
   elStage.innerHTML = `
@@ -281,17 +340,21 @@ function draw(){
   elStage.querySelectorAll(".opt").forEach((btn,i)=>{
     btn.addEventListener("click", ()=>{
       const opt = opts[i];
+
       // メモ
       if(state.stack.length===0){ state.memo.grade = opt.label; }
       if(node.id==="hs-level"){ state.memo.hsLevel = opt.label; }
       if(node.id==="hs-subject"){ state.memo.hsSubject = opt.label; }
 
-      // 中1/2の長文は基礎に寄せ替え
-      if(node.id==="jhs-eng-reading" && (state.memo.grade==="中1"||state.memo.grade==="中2")){
-        if(opt.toResult && opt.toResult!=="jhs-eng-reading-basic"){ opt.toResult="jhs-eng-reading-basic"; }
+      // 安全網：中1・中2の英語長文は常に「基礎」に強制
+      if (node.id==="jhs-eng-reading" && (state.memo.grade==="中1" || state.memo.grade==="中2")) {
+        if (opt.toResult && opt.toResult!=="jhs-eng-reading-basic") {
+          opt.toResult="jhs-eng-reading-basic";
+        }
       }
 
       state.stack.push({nodeId:node.id, label:opt.label});
+
       if(opt.next){ state.current=opt.next; draw(); }
       else if(opt.toResult){
         if(opt.toResult.startsWith("HS/")){
@@ -307,9 +370,14 @@ function draw(){
   setProgress(); renderCrumbs();
 }
 
+/* === 中学生結果描画 === */
 function renderResults(key){
   const cards = (decisionTree.results[key]||[]);
   state.lastResults = cards;
+  if(!elStage){
+    console.warn("Missing #stage element.");
+    return;
+  }
   elStage.innerHTML = cards.length ? `
     <div class="results">${cards.map(cardHTML).join("")}</div>
     <div class="copywrap"><div class="copy" id="copyText">${plainText(cards)}</div></div>
@@ -317,52 +385,65 @@ function renderResults(key){
   setProgress(); renderCrumbs();
 }
 
-/* ===== 高校：学年×レベルで動的結果 ===== */
+/* === 高校結果描画（学年キャップ＆自動ダウングレード） === */
 function renderHsResults(subject, area){
-  const level = mapLevel(state.memo.hsLevel||"基礎");
+  const rawLevel = mapLevel(state.memo.hsLevel||"基礎");
   const grade = state.memo.grade||"高1";
-  const lib = HS_LIB[subject]?.[area]?.[level] || [];
-  const cards = lib.map(adaptByGrade(grade, subject, area, level));
-  state.lastResults = cards;
+  const level = capLevelByGrade(rawLevel, grade);
 
+  // 高1・高2で数学の「最難関向け」を選んだら safer に（basic へ寄せる）
+  let actualArea = area;
+  if (isHS1or2(grade)) {
+    if (subject==="math" && area==="top") actualArea="basic";
+  }
+
+  const libRoot = HS_LIB[subject]?.[actualArea] || {};
+  const lib = libRoot[level] || [];
+  const cards = lib.map(adaptByGrade(grade, subject, actualArea, level));
+
+  state.lastResults = cards;
+  if(!elStage){
+    console.warn("Missing #stage element.");
+    return;
+  }
   const path = state.stack.map(s=>s.label).join(" > ");
+  const cappedNote = (rawLevel!==level || area!==actualArea) && isHS1or2(grade)
+    ? "\n※学年に合わせて推奨レベル/分野を調整しています（高1・高2はL2まで）。"
+    : "";
+
   elStage.innerHTML = `
     <div class="results">${cards.map(cardHTML).join("")}</div>
-    <div class="copywrap"><div class="copy" id="copyText">【条件】${path}\n${plainList(cards)}</div></div>
+    <div class="copywrap"><div class="copy" id="copyText">【条件】${path}${cappedNote}\n${plainList(cards)}</div></div>
   `;
   setProgress(); renderCrumbs();
 }
 
-function mapLevel(lbl){
-  if (!lbl) return "L1";
-  // 1) 最難関を最優先
-  if (lbl.includes("最難関")) return "L4";
-  // 2) 「標準」を先に判定（※「準難関」の“難関”に誤ヒットさせない）
-  if (lbl.includes("標準")) return "L2";
-  // 3) 「難関」ただし「準難関」を含む場合は除外
-  if (lbl.includes("難関") && !lbl.includes("準難関")) return "L3";
-  // 4) それ以外は基礎
-  return "L1";
-}
-
-// 学年で注記を微調整
+/* === 学年に応じたカード加工 === */
 function adaptByGrade(grade, subject, area, level){
   return (c)=>{
     const x={...c};
+    x.tags = Array.isArray(x.tags)?[...x.tags]:[];
+    x.tags.push(`学年:${grade}`, `Lv:${level.replace("L","")}`);
+
     if(subject==="math"){
       const span = grade==="高1" ? "数I・A中心" : grade==="高2" ? "数II・Bまで" : "数III含む";
-      x.tags = (x.tags||[]).concat([span]);
-      if(level==="L4" && grade!=="高3/既卒"){
-        x.tip = (x.tip?x.tip+" ":"")+"※高1・高2は先取り注意。まずは基礎/標準を完了。";
+      x.tags.push(span, `分野:${area}`);
+      if (isHS1or2(grade) && (level==="L3"||level==="L4")) {
+        x.tip = (x.tip?x.tip+" ":"")+"※高1・高2は基礎〜標準の反復を最優先。";
+      }
+      if (area==="top" && isHS1or2(grade)) {
+        x.why = (x.why?x.why+" ":"")+"（選択は最難関向けでしたが、学年に合わせて“入試基礎”へ調整）";
       }
     }
-    if(["phy","chem","bio","jh","wh"].includes(subject) && grade!=="高3/既卒"){
-      x.tip = (x.tip?x.tip+" ":"")+"※この科目セットは高3/既卒向けです。";
+
+    if(["phy","chem","bio","jh","wh"].includes(subject) && !isHS3(grade)){
+      x.tip = (x.tip?x.tip+" ":"")+"※この科目セットは高3/既卒向けです。高1・高2は英数国の基礎完成を優先。";
     }
     return x;
   };
 }
 
+/* === カードHTML / テキスト出力 === */
 function cardHTML(c){
   return `
     <div class="card">
@@ -374,7 +455,6 @@ function cardHTML(c){
     </div>
   `;
 }
-
 function plainText(items){ return items.map((c,i)=>`[${i+1}] ${c.title}\n- タグ: ${(c.tags||[]).join(", ")}\n- なぜ: ${c.why||""}\n- コツ: ${c.tip||""}`).join("\n\n"); }
 function plainList(items){ return plainText(items); }
 
@@ -387,7 +467,6 @@ function back(){
   for(const step of replay){
     const node=findNode(state.current); if(!node) break;
     let opt=(node.options.find(o=>o.label===step.label) || node.options[0]);
-    // 再構築メモ
     if(state.stack.length===0){ state.memo.grade = opt.label; }
     if(node.id==="hs-level"){ state.memo.hsLevel = opt.label; }
     if(node.id==="hs-subject"){ state.memo.hsSubject = opt.label; }
@@ -412,14 +491,31 @@ function resetAll(){ state.stack=[]; state.current=decisionTree.start; state.las
 async function copyResults(){
   const path = state.stack.map(s=>s.label).join(" > ");
   const text = `【条件】${path}\n` + plainText(state.lastResults);
-  try{ await navigator.clipboard.writeText(text); this.textContent="コピーしました！"; setTimeout(()=>this.textContent="結果をコピー",1600); }
-  catch(e){
-    const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-    this.textContent="コピーしました！"; setTimeout(()=>this.textContent="結果をコピー",1600);
+  try{
+    await navigator.clipboard.writeText(text);
+    this.textContent="コピーしました！";
+    setTimeout(()=>this.textContent="結果をコピー",1600);
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    this.textContent="コピーしました！";
+    setTimeout(()=>this.textContent="結果をコピー",1600);
   }
 }
 
-/* 初期表示 */
+/* === 初期化（DOM構築後にUI要素をひも付け） === */
+function initUI(){
+  elStage = $("#stage");
+  elBar = $("#bar");
+  elCrumbs = $("#crumbs");
 
-draw();
+  $("#backBtn")?.addEventListener("click", back);
+  $("#shareBtn")?.addEventListener("click", copyResults);
+  $("#restartBtn")?.addEventListener("click", restartFromGrade);
+  $("#resetTop")?.addEventListener("click", resetAll);
 
+  draw();
+}
+if (document.readyState !== "loading") initUI();
+else document.addEventListener("DOMContentLoaded", initUI);
