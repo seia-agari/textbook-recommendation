@@ -3,37 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教材選定</title>
-    <link rel="stylesheet" href="style.css"></link>
+    <title>学力診断 & 教材レコメンド</title>
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand"><span class="logo"></span>1対1スマイルスタディ｜教材レコメンド</div>
-    <button class="btn reset" id="resetTop">はじめから</button>
-  </header>
-
-  <div class="panel">
-    <div class="progress"><div class="bar" id="bar"></div></div>
-    <div class="crumbs" id="crumbs"></div>
-    <div id="stage"></div>
-    <div class="actions">
-      <button class="btn back" id="backBtn">戻る</button>
-      <button class="btn share" id="shareBtn">結果をコピー</button>
-      <button class="btn primary" id="restartBtn">この条件でやり直す</button>
-    </div>
-    <br>
-    <footer style="display:flex; justify-content:left; position:relative; font-size:14px;">
-  <span>@smile study</span>
-  <a href="privacy.html" target="_blank"
-     style="color:#888; text-decoration:none; font-size:12px; position:absolute; right:0;">
-    プライバシーポリシー
-  </a>
-  </footer>
-    <br>
-  </div>
-</div>
+    
 </body>
-
 </html>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="main-container">
+        <div id="app-pane" class="app-pane">
+            
+            <div id="home-screen" class="app-container">
+                <div class="home-illustration">
+                    <img src="https://smilestudy-kasukabe.com/wp-content/uploads/2025/10/e79c8613-95d9-4c24-b4da-9d8a3e80944d.jpg" alt="スマイルスタディのイラスト">
+                </div>
+                <div class="home-content">
+                    <h1>学力診断 & 教材レコメンド</h1>
+                    <p>あなたの学力や目的に合わせて、最適な学習プランを提案します。</p>
+                    <div class="btn-container">
+                        <button id="start-test-btn" class="btn">学力診断テストを受ける</button>
+                        <button id="start-recommend-btn" class="btn secondary">自分で教材を探す</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="selection-screen" class="app-container" style="display: none;">
+                <div class="selection-illustration">
+                    <img src="https://smilestudy-kasukabe.com/wp-content/uploads/2025/10/Generated-Image-October-24-2025-2_20PM.jpg" alt="診断テストのイラスト">
+                </div>
+                <div class="selection-content">
+                    <h1>学力診断テスト</h1>
+                    <p>診断したい学年と科目を選んでください。</p>
+                    <form id="start-test-form">
+                        <div class="form-group"><label for="grade">学年:</label><select id="grade" name="grade"><option value="1">中学1年生</option><option value="2">中学2年生</option><option value="3">中学3年生</option></select></div>
+                        <div class="form-group"><label for="subject">科目:</label><select id="subject" name="subject"><option value="english">英語</option><option value="math">数学</option></select></div>
+                        <button type="submit" class="btn">テストを開始</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="test-screen" class="app-container" style="display: none;">
+                <div id="timer">10:00</div>
+                <h1 id="test-title"></h1>
+                <div id="progress-container">
+                    <span id="progress-text"></span>
+                    <div class="progress"><div class="bar" id="test-progress-bar"></div></div>
+                </div>
+                <form id="test-form" class="test-form"></form>
+                <div id="test-navigation">
+                    <button id="prev-question-btn" class="btn secondary">前へ</button>
+                    <button id="next-question-btn" class="btn">次へ</button>
+                    <button id="submit-test-btn" class="btn" style="display: none;">結果を見る</button>
+                </div>
+            </div>
+
+            <div id="result-screen" class="app-container" style="display: none;">
+                <h1>診断結果</h1>
+                <div id="total-score"></div>
+                
+                <div class="result-layout-container">
+                    <div class="chart-container"><canvas id="resultChart"></canvas></div>
+                    <div class="analysis">
+                        <h2>分析とアドバイス</h2>
+                        <p id="analysis-comment"></p>
+                    </div>
+                </div>
+
+                <div id="recommendations-container">
+                    <h2>弱点を克服する おすすめ教材</h2>
+                    <div id="recommended-books-results" class="results"></div>
+                </div>
+                
+                <div id="result-details">
+                    <h2>テストの振り返り</h2>
+                    <div id="result-tabs">
+                        <button class="tab-btn" data-tab="all">すべて</button>
+                        <button class="tab-btn" data-tab="correct">正解</button>
+                        <button class="tab-btn" data-tab="incorrect">不正解</button>
+                    </div>
+                    <div id="result-details-content-all" class="tab-content"></div>
+                    <div id="result-details-content-correct" class="tab-content"></div>
+                    <div id="result-details-content-incorrect" class="tab-content"></div>
+                </div>
+
+                <div class="result-actions">
+                    <button id="print-results-btn" class="btn">結果をPDFで保存/印刷</button>
+                    <button id="back-to-home-from-test" class="btn secondary">ホームに戻る</button>
+                </div>
+            </div>
+
+            <div id="recommend-app-container" class="app-container" style="display: none;">
+                <div class="wrap">
+                    <header>
+                      <div class="brand"><span class="logo"></span>教材レコメンド</div>
+                      <button class="btn reset" id="rec-resetTop">はじめから</button>
+                    </header>
+                    <div class="panel">
+                      <div class="progress"><div class="bar" id="rec-bar"></div></div>
+                      <div class="crumbs" id="rec-crumbs"></div>
+                      <div id="rec-stage"></div>
+                      <div class="actions">
+                        <button class="btn back" id="rec-backBtn">戻る</button>
+                        <button class="btn share" id="rec-shareBtn">結果をコピー</button>
+                        <button class="btn primary" id="rec-restartBtn">この条件でやり直す</button>
+                      </div>
+                      <br>
+                      <footer style="display:flex; justify-content:space-between; align-items: center; position:relative; font-size:14px;">
+                        <button id="back-to-home-from-rec" class="btn secondary">ホームに戻る</button>
+                        <span>@smile study</span>
+                        <a href="#" id="privacy-link" style="color:#888; text-decoration:none; font-size:12px;">プライバシーポリシー</a>
+                      </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacy-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div id="privacy-content"></div>
+        </div>
+    </div>
