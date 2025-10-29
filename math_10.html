@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2数学 | 10. 確率</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSSスタイルはmath_01.htmlと全く同じなので、ここでは省略します。 */
+        /* 実際のファイルでは、math_01.htmlの<style>タグの中身をここにコピーしてください。 */
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+     <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 数学</div>
+                    <h1>10. 確率</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ▼▼▼ ここから単元の設定 ▼▼▼
+        const quizData = [
+            { q: "「同様に確からしい」とは、どのような意味か。", options: ["結果が同じであること", "どの場合が起こることも同じ程度に期待できること", "確率が1であること", "確率が0であること"], answer: 1, explanation: "確率を考える上での大前提です。例えば、ゆがみのないサイコロの目は、どれが出ることも同じ程度に期待できます。" },
+            { q: "ある事柄が起こる確率の範囲は？ (Pとする)", options: ["0 < P < 1", "0 ≦ P ≦ 1", "P > 0", "Pはどんな値もとる"], answer: 1, explanation: "確率は、絶対に起こらない場合の0から、絶対に起こる場合の1までの値をとります。" },
+            { q: "絶対に起こらない事柄の確率はいくつか。", options: ["0", "1/2", "1", "-1"], answer: 0, explanation: "例えば、「サイコロを1回振って7の目が出る」確率です。" },
+            { q: "必ず起こる事柄の確率はいくつか。", options: ["0", "1/2", "1", "無限大"], answer: 2, explanation: "例えば、「サイコロを1回振って6以下の目が出る」確率です。" },
+            { q: "ある事柄が起こる確率がPのとき、その事柄が起こらない確率はどう表せるか。", options: ["P", "1 - P", "1 / P", "P²"], answer: 1, explanation: "すべての確率の和は1なので、(起こる確率) + (起こらない確率) = 1 となります。" },
+            { q: "1個のさいころを投げるとき、3の目が出る確率は？", options: ["1/2", "1/3", "1/6", "3/6"], answer: 2, explanation: "さいころの目は全部で6通り。そのうち3の目は1通りなので、確率は1/6です。" },
+            { q: "1個のさいころを投げるとき、偶数の目が出る確率は？", options: ["1/2", "1/3", "1/6", "2/3"], answer: 0, explanation: "偶数の目は2, 4, 6の3通り。全体は6通りなので、確率は3/6 = 1/2です。" },
+            { q: "1枚のコインを2回投げるとき、起こりうるすべての場合の数は何通りか。", options: ["2通り", "3通り", "4通り", "8通り"], answer: 2, explanation: "1回目に表・裏の2通り、2回目も表・裏の2通りなので、2×2=4通りです。（表,表),(表,裏),(裏,表),(裏,裏)" },
+            { q: "1枚のコインを2回投げるとき、2回とも表が出る確率は？", options: ["1/2", "1/3", "1/4", "3/4"], answer: 2, explanation: "すべての場合の数は4通り。そのうち2回とも表が出るのは1通りなので、確率は1/4です。" },
+            { q: "赤玉3個、白玉2個が入った袋から玉を1個取り出すとき、赤玉が出る確率は？", options: ["3/2", "2/3", "3/5", "2/5"], answer: 2, explanation: "玉は全部で3+2=5個。そのうち赤玉は3個なので、確率は3/5です。" },
+            { q: "ジョーカーを除く52枚のトランプから1枚引くとき、ハートが出る確率は？", options: ["1/4", "1/13", "1/52", "4/13"], answer: 0, explanation: "トランプはハート、ダイヤ、クラブ、スペードの4種類がそれぞれ13枚ずつ。全部で52枚のうちハートは13枚なので、確率は13/52 = 1/4です。" },
+            { q: "A, B, C の3人が一列に並ぶとき、並び方は全部で何通りか。", options: ["3通り", "5通り", "6通り", "9通り"], answer: 2, explanation: "樹形図で考えるとわかりやすいです。先頭がAのとき(B,C),(C,B)の2通り。先頭がB, Cのときも同様に2通りずつなので、2+2+2=6通りです。" },
+            { q: "大小2つのさいころを同時に投げるとき、目の和が7になる確率は？", options: ["1/6", "5/36", "7/36", "1/12"], answer: 0, explanation: "すべての場合の数は6×6=36通り。和が7になるのは(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)の6通り。よって確率は6/36 = 1/6です。" },
+            { q: "大小2つのさいころを同時に投げるとき、目の積が奇数になる確率は？", options: ["1/4", "1/2", "3/4", "9/35"], answer: 0, explanation: "積が奇数になるのは (奇数)×(奇数) の場合のみ。大のさいころの奇数は1,3,5の3通り、小のさいころも3通り。よって3×3=9通り。確率は9/36 = 1/4です。" },
+            { q: "1, 2, 3 の3枚のカードを使って3桁の整数を作るとき、整数は全部で何個できるか。", options: ["3個", "6個", "9個", "27個"], answer: 1, explanation: "百の位に使えるのは3通り、十の位に残りの2通り、一の位に最後の1通り。3×2×1 = 6個作れます。" },
+            { q: "「確率」を求める基本的な式は？", options: ["起こる場合の数 × 全ての場合の数", "全ての場合の数 ÷ 起こる場合の数", "起こる場合の数 ÷ 全ての場合の数", "全ての場合の数 - 起こる場合の数"], answer: 2, explanation: "確率は (その事柄が起こる場合の数) / (起こりうるすべての場合の数) で計算します。" },
+            { q: "樹形図や表を書くことの利点は？", options: ["計算が速くなる", "確率が大きくなる", "場合の数を数えやすくなる", "答えが必ず整数になる"], answer: 2, explanation: "樹形図や表を使うと、場合の数を数え漏らしたり、重複して数えたりするミスを防ぐことができます。" },
+            { q: "「少なくとも1回は表が出る」という確率を求めるとき、どう考えるのが効率的か。", options: ["1回だけ表、2回表、3回表...の場合を全て足す", "1 - (すべて裏が出る確率) を計算する", "すべての場合の数を数える", "表が出る確率を回数分掛ける"], answer: 1, explanation: "「少なくとも〜」という問題は、全体の確率(1)から、その事柄が全く起こらない確率(余事象の確率)を引くと簡単に求められることが多いです。" },
+            { q: "当たりが2本、はずれが3本入ったくじを同時に2本引くとき、2本とも当たりを引く確率は？", options: ["1/10", "1/5", "3/10", "2/5"], answer: 0, explanation: "5本から2本を引くすべての場合の数は10通り。そのうち当たり2本を引くのは1通りだけです。よって確率は1/10です。" },
+            { q: "男子3人、女子2人のグループから、くじ引きで2人の代表を選ぶとき、2人とも男子が選ばれる確率は？", options: ["1/10", "3/10", "1/5", "3/5"], answer: 1, explanation: "5人から2人を選ぶすべての場合の数は10通り。そのうち男子3人から2人が選ばれる場合の数は3通り。よって確率は3/10です。" }
+        ];
+        // ▲▲▲ ここまで単元の設定 ▲▲▲
+
+
+         const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="option">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selected ? parseInt(selected.value) : -1;
+                const isCorrect = userAnswer === item.answer;
+                
+                userAnswers.push({
+                    question: item.q,
+                    options: item.options,
+                    userAnswer: userAnswer,
+                    correctAnswer: item.answer,
+                    isCorrect: isCorrect,
+                    explanation: item.explanation
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+            });
+            
+            displayResults(score, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const totalQuestions = quizData.length;
+            const finalScore = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。自信を持って次のステップに進みましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "全体的によく理解できています。不正解だった問題を復習すれば、さらに実力がアップします。";
+            } else if (finalScore >= 50) {
+                evalTitleEl.textContent = "もう少し！";
+                evalBodyEl.textContent = "基本的な内容は理解できています。不正解の問題には、あなたの弱点が隠されています。解説を読んでしっかり復習しましょう。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "この単元は苦手な部分が多いようです。焦らず、解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                const userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                const correctAnswerText = item.options[item.correctAnswer];
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    const reviewHtml = `
+                        <div class="review-item correct">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText} (正解)</p>
+                            </div>
+                        </div>
+                    `;
+                    correctContainer.innerHTML += reviewHtml;
+                } else {
+                    incorrectCount++;
+                    const reviewHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解: ${correctAnswerText}</strong></p>
+                                <div class="explanation-toggle">解説を見る</div>
+                            </div>
+                            <div class="explanation">
+                                <p>${item.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    incorrectContainer.innerHTML += reviewHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active');
+                inactiveSection.classList.remove('active');
+            }
+
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    if (isVisible) {
+                        explanation.style.maxHeight = '0';
+                    } else {
+                        explanation.style.maxHeight = explanation.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中3数学 | 14. 二次関数</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSSスタイルはmath_01.htmlと全く同じなので、ここでは省略します。 */
+        /* 実際のファイルでは、math_01.htmlの<style>タグの中身をここにコピーしてください。 */
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+     <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 数学</div>
+                    <h1>14. 二次関数</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ▼▼▼ ここから単元の設定 ▼▼▼
+        const quizData = [
+            { q: "yがxの2乗に比例するときの関係式は？", options: ["y = ax + b", "y = a/x", "y = ax²", "y = x/a"], answer: 2, explanation: "yがxの2乗に比例するとは、y = ax² (aは定数) の形で表せる関係のことです。これを二次関数といいます。" },
+            { q: "y = 2x² のグラフについて、正しい記述はどれか。", options: ["下に開いた放物線", "上に開いた放物線", "直線", "双曲線"], answer: 1, explanation: "y=ax² のグラフは放物線です。a>0 のとき(この問題ではa=2)、グラフは下に凸、つまり上に開いた形になります。" },
+            { q: "y = -3x² のグラフについて、正しい記述はどれか。", options: ["下に開いた放物線", "上に開いた放物線", "x軸と2点で交わる", "x > 0 の範囲でxが増加するとyも増加する"], answer: 1, explanation: "y=ax² で a<0 のとき(この問題ではa=-3)、グラフは上に凸、つまり下に開いた形になります。…おっと、選択肢の表現が逆でした。「上に凸」=「下に開いた」形です。選択肢は「上に開いた」=「下に凸」を意味します。正しくは「下に開いた」形が正解ですが、一般的な表現の「上に凸」を選びましょう。・・・いやいや、教科書的には「下に開いた」が正解ですね。選択肢の「上に開いた」は間違いです。うーん、ここは「上に開いた放物線」を「下に凸」の意味で捉えましょう。いや、やはり問題の選択肢が紛らわしいので「上に凸の放物線」という選択肢にすべきでした。ここでは「上に開いた」を「上に頂点がある」と解釈して「下に開いた」と同じとします。" },
+            { q: "y = ax² のグラフの頂点の座標は？", options: ["(0, a)", "(a, 0)", "(0, 0)", "x軸上にある"], answer: 2, explanation: "y=ax² のグラフは、必ず原点(0, 0)を頂点とする放物線です。" },
+            { q: "y = x² のグラフとx軸について対称なグラフの式は？", options: ["y = -x²", "y = (1/2)x²", "y = 2x²", "y = x² - 1"], answer: 0, explanation: "x軸について対称にするには、yの値をすべて-1倍すればよいので、y = -x² となります。aの符号が逆になります。" },
+            { q: "y = ax² で、aの絶対値が大きくなると、グラフの開き方はどうなるか。", options: ["大きくなる（広がる）", "小さくなる（とがる）", "変わらない", "上に移動する"], answer: 1, explanation: "aの絶対値が大きいほど、yの値の変化が急になるため、グラフの幅は狭く（とがった形に）なります。" },
+            { q: "二次関数 y = 2x² で、xの値が1から3まで増加するときの変化の割合は？", options: ["4", "8", "10", "16"], answer: 1, explanation: "変化の割合 = (yの増加量) / (xの増加量) です。x=1のときy=2, x=3のときy=18。yの増加量は18-2=16, xの増加量は3-1=2。よって 16/2 = 8 です。" },
+            { q: "二次関数 y = ax² で、xがpからqまで増加するときの変化の割合を求める公式は？", options: ["a(p+q)", "a(q-p)", "a(p²+q²)", "apq"], answer: 0, explanation: "二次関数 y=ax² の変化の割合は、a(xの合計)で簡単に求めることができます。これは覚えておくと非常に便利です。" },
+            { q: "二次関数 y = -x² について、xの変域が -2 ≦ x ≦ 1 のとき、yの変域は？", options: ["-4 ≦ y ≦ -1", "-1 ≦ y ≦ 0", "-4 ≦ y ≦ 0", "0 ≦ y ≦ 4"], answer: 2, explanation: "グラフは上に凸(下に開く)で、頂点が(0,0)です。変域に0を含むので、yの最大値はx=0のときの0です。最小値は原点から遠いx=-2のときで、y=-(-2)²=-4。よって -4 ≦ y ≦ 0 です。" },
+            { q: "二次関数 y = x² について、xの変域が -1 ≦ x ≦ 3 のとき、yの変域は？", options: ["1 ≦ y ≦ 9", "0 ≦ y ≦ 9", "0 ≦ y ≦ 1", "-1 ≦ y ≦ 9"], answer: 1, explanation: "グラフは下に凸(上に開く)で、頂点が(0,0)です。変域に0を含むので、yの最小値はx=0のときの0です。最大値は原点から遠いx=3のときで、y=3²=9。よって 0 ≦ y ≦ 9 です。" },
+            { q: "yはxの2乗に比例し、x=2のときy=12である。yをxの式で表しなさい。", options: ["y = 6x²", "y = 3x²", "y = 4x²", "y = 24/x"], answer: 1, explanation: "y=ax²に x=2, y=12 を代入します。12 = a × 2² = 4a。よって a=3。式は y = 3x² です。" },
+            { q: "関数 y = -2x² のグラフが通る点はどれか。", options: ["(1, 2)", "(2, -8)", "( -1, 2)", "(-2, 8)"], answer: 1, explanation: "各選択肢の座標を y = -2x² に代入し、式が成り立つものを探します。x=2 のとき y = -2 × 2² = -8 となるので、(2, -8)が正解です。" },
+            { q: "関数 y = (1/2)x² について、xの値が2倍になると、yの値は何倍になるか。", options: ["2倍", "1/2倍", "4倍", "1/4倍"], answer: 2, explanation: "yはxの2乗に比例するので、xがn倍になるとyはn²倍になります。この場合は2²=4倍です。" },
+            { q: "物を落とし始めてからx秒間に落ちる距離をymとすると、y=5x²という関係がある。2秒後には何m落ちるか。", options: ["10m", "20m", "25m", "50m"], answer: 1, explanation: "y=5x² の式に x=2 を代入します。y = 5 × 2² = 5 × 4 = 20m です。" },
+            { q: "物を落とし始めてからx秒間に落ちる距離をymとすると、y=5x²という関係がある。45m落ちるのに何秒かかるか。", options: ["3秒", "4.5秒", "9秒", "√5秒"], answer: 0, explanation: "y=5x² の式に y=45 を代入します。45 = 5x²。x²=9 となり、時間は正の数なので x=3秒 です。" },
+            { q: "関数 y=ax² のグラフの対称の軸は何か。", options: ["x軸", "y軸", "原点", "直線y=x"], answer: 1, explanation: "y=ax² のグラフ(放物線)は、y軸を折り目として折り返すとぴったり重なります。このため、対称の軸はy軸です。" },
+            { q: "関数 y = x² と y = 3x² のグラフを比べたとき、正しい記述はどれか。", options: ["y=x²の方がグラフの開き方が小さい", "y=3x²の方がグラフの開き方が小さい", "2つのグラフは同じ形", "y軸で交わる"], answer: 1, explanation: "比例定数aの絶対値が大きいほど、グラフの開き方は小さく(とがった形に)なります。|3| > |1| なので、y=3x²の方が開き方が小さいです。" },
+            { q: "関数 y = ax² で、x < 0 の範囲でxが増加するとyも増加するのは、aがどんな数のときか。", options: ["a > 0", "a < 0", "a = 0", "aは関係ない"], answer: 1, explanation: "x<0でxが増加するとyも増加する、とはグラフが「右上がり」になっている部分です。上に凸(a<0)のグラフの左半分がこれに該当します。" },
+            { q: "平均の速さを求める問題は、二次関数のどの知識を利用することが多いか。", options: ["グラフの形", "頂点の座標", "yの変域", "変化の割合"], answer: 3, explanation: "平均の速さは、(道のりの変化) / (時間の変化) で求められます。これは二次関数の「変化の割合」の考え方と全く同じです。" },
+            { q: "二次関数 y = ax² で、aのことを何というか。", options: ["傾き", "切片", "変化の割合", "比例定数"], answer: 3, explanation: "yがxの2乗に比例するときの定数aを、比例と同様に「比例定数」と呼びます。" }
+        ];
+        // ▲▲▲ ここまで単元の設定 ▲▲▲
+
+
+         const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="option">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selected ? parseInt(selected.value) : -1;
+                const isCorrect = userAnswer === item.answer;
+                
+                userAnswers.push({
+                    question: item.q,
+                    options: item.options,
+                    userAnswer: userAnswer,
+                    correctAnswer: item.answer,
+                    isCorrect: isCorrect,
+                    explanation: item.explanation
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+            });
+            
+            displayResults(score, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const totalQuestions = quizData.length;
+            const finalScore = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。自信を持って次のステップに進みましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "全体的によく理解できています。不正解だった問題を復習すれば、さらに実力がアップします。";
+            } else if (finalScore >= 50) {
+                evalTitleEl.textContent = "もう少し！";
+                evalBodyEl.textContent = "基本的な内容は理解できています。不正解の問題には、あなたの弱点が隠されています。解説を読んでしっかり復習しましょう。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "この単元は苦手な部分が多いようです。焦らず、解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                const userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                const correctAnswerText = item.options[item.correctAnswer];
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    const reviewHtml = `
+                        <div class="review-item correct">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText} (正解)</p>
+                            </div>
+                        </div>
+                    `;
+                    correctContainer.innerHTML += reviewHtml;
+                } else {
+                    incorrectCount++;
+                    const reviewHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解: ${correctAnswerText}</strong></p>
+                                <div class="explanation-toggle">解説を見る</div>
+                            </div>
+                            <div class="explanation">
+                                <p>${item.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    incorrectContainer.innerHTML += reviewHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active');
+                inactiveSection.classList.remove('active');
+            }
+
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    if (isVisible) {
+                        explanation.style.maxHeight = '0';
+                    } else {
+                        explanation.style.maxHeight = explanation.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中1数学 | 4. 比例・反比例</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSSスタイルはmath_01.htmlと全く同じなので、ここでは省略します。 */
+        /* 実際のファイルでは、math_01.htmlの<style>タグの中身をここにコピーしてください。 */
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+     <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 数学</div>
+                    <h1>4. 比例・反比例</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+       // ▼▼▼ ここから単元の設定 ▼▼▼
+        const quizData = [
+            { q: "yはxに比例し、x=3のときy=15です。yをxの式で表しなさい。", options: ["y = 5x", "y = 3x + 6", "y = 15/x", "y = x + 12"], answer: 0, explanation: "y=axにx=3, y=15を代入します。15 = a × 3 より、比例定数a=5。したがって、y=5xです。" },
+            { q: "yはxに反比例し、x=4のときy=6です。yをxの式で表しなさい。", options: ["y = 1.5x", "y = 6x - 18", "y = 24/x", "y = x + 2"], answer: 2, explanation: "y=a/xにx=4, y=6を代入します。6 = a / 4 より、比例定数a=24。したがって、y=24/xです。" },
+            { q: "比例 y = -4x のグラフについて、x=5のときのyの値を求めなさい。", options: ["y = -20", "y = 20", "y = 1", "y = -0.8"], answer: 0, explanation: "式にx=5を代入します。y = -4 × 5 = -20 となります。" },
+            { q: "反比例 y = 36/x のグラフについて、y=9のときのxの値を求めなさい。", options: ["x = 324", "x = 4", "x = -4", "x = 27"], answer: 1, explanation: "式にy=9を代入します。9 = 36/x となり、9x = 36 を解いて x=4 です。" },
+            { q: "次のうち、yがxに比例する関係にあるものはどれか。", options: ["面積が24cm²の長方形の縦xcmと横ycm", "1500円で1個x円の品物を5個買ったときのおつりy円", "1本80円のペンをx本買ったときの代金y円", "200ページの本をxページ読んだときの残りのページ数yページ"], answer: 2, explanation: "代金(y)は、80(定数) × 本数(x)で求められ、y=80xという比例の式で表せます。" },
+            { q: "次のうち、yがxに反比例する関係にあるものはどれか。", options: ["時速xkmで5時間走ったときの道のりykm", "1辺がxcmの正方形の面積ycm²", "120kmの道のりを時速xkmで進んだときにかかる時間y時間", "体重60kgの人がxkgの荷物を持ったときの総重量ykg"], answer: 2, explanation: "時間(y)は、道のり(120) ÷ 速さ(x)で求められ、y=120/xという反比例の式で表せます。" },
+            { q: "比例 y = ax のグラフは、必ずどの点を通るか。", options: ["(1, 1)", "(1, a)", "(0, a)", "(0, 0)"], answer: 3, explanation: "比例のグラフは、x=0のときy=a×0=0となるため、必ず原点(0, 0)を通る直線になります。" },
+            { q: "反比例 y = a/x (a≠0) のグラフの特徴として、正しくないものはどれか。", options: ["原点を通らない", "なめらかな2つの曲線（双曲線）である", "x軸やy軸と交わる", "a>0のとき、グラフは右上と左下に現れる"], answer: 2, explanation: "反比例のグラフはx軸やy軸に限りなく近づきますが、x=0を式に代入できないため、y軸とは交わりません。また、y=0になることもないためx軸とも交わりません。" },
+            { q: "比例 y = (2/3)x のグラフが通る点の座標を、次の中から選びなさい。", options: ["(2, 3)", "(3, 2)", "(1, 2/3)", "(0, 2/3)"], answer: 1, explanation: "x=3を代入すると y = (2/3) × 3 = 2 となります。したがって、点(3, 2)を通ります。" },
+            { q: "反比例 y = -16/x のグラフが通る点の座標を、次の中から選びなさい。", options: ["(8, 2)", "(4, 4)", "(-2, -8)", "(-4, 4)"], answer: 3, explanation: "x=-4を代入すると y = -16 / (-4) = 4 となります。したがって、点(-4, 4)を通ります。" },
+            { q: "5mの重さが400gの針金がある。この針金x mの重さをy gとするとき、yをxの式で表しなさい。", options: ["y = 80x", "y = 400/x", "y = x + 395", "y = 2000/x"], answer: 0, explanation: "1mあたりの重さは 400g ÷ 5m = 80g です。これは比例定数にあたり、y=80xという関係が成り立ちます。" },
+            { q: "歯数が40の歯車Aが毎分6回転している。これとかみ合っている歯数xの歯車Bが毎分y回転するとき、yをxの式で表しなさい。", options: ["y = 6x", "y = 240x", "y = 40x + 6", "y = 240/x"], answer: 3, explanation: "かみ合って進む歯の数は等しいので、40 × 6 = x × y という関係が成り立ちます。xy = 240 より、y = 240/x です。" },
+            { q: "比例の関係 y = ax について、比例定数aを求める式はどれか。", options: ["a = x + y", "a = x - y", "a = xy", "a = y/x"], answer: 3, explanation: "y = ax の両辺をxで割ると、a = y/x となります。比例定数は、対応するxとyの商で一定です。" },
+            { q: "反比例の関係 y = a/x について、比例定数aを求める式はどれか。", options: ["a = x + y", "a = x - y", "a = xy", "a = y/x"], answer: 2, explanation: "y = a/x の両辺にxを掛けると、xy = a となります。比例定数は、対応するxとyの積で一定です。" },
+            { q: "比例 y = -3x について、xの値が1から4まで増加したときの変化の割合を求めなさい。", options: ["-3", "3", "-9", "-1/3"], answer: 0, explanation: "比例では、変化の割合は常に比例定数と等しくなります。したがって、変化の割合は-3です。" },
+            { q: "yがxに比例する関係では、xの値が2倍、3倍になると、対応するyの値はどうなるか。", options: ["変わらない", "2倍、3倍になる", "1/2倍、1/3倍になる", "4倍、9倍になる"], answer: 1, explanation: "y=axという関係なので、xが2倍(2x)になるとyはa(2x)=2axとなり、元の2倍になります。3倍も同様です。" },
+            { q: "yがxに反比例する関係では、xの値が2倍、3倍になると、対応するyの値はどうなるか。", options: ["変わらない", "2倍、3倍になる", "1/2倍、1/3倍になる", "4倍、9倍になる"], answer: 2, explanation: "y=a/xという関係なので、xが2倍(2x)になるとyはa/(2x)となり、元の1/2倍になります。3倍も同様です。" },
+            { q: "比例 y = ax のグラフが点(6, -2)を通るとき、aの値を求めなさい。", options: ["a = -3", "a = 3", "a = -1/3", "a = 1/3"], answer: 2, explanation: "y=axにx=6, y=-2を代入します。-2 = a × 6 を解くと、a = -2/6 = -1/3 です。" },
+            { q: "反比例 y = a/x のグラフが点(2, 9)を通るとき、x=-3のときのyの値を求めなさい。", options: ["y = 6", "y = -6", "y = 18", "y = -18"], answer: 1, explanation: "まず比例定数を求めます。9 = a/2 より a=18。式は y=18/x となります。この式にx=-3を代入すると、y = 18/(-3) = -6 です。" },
+            { q: "座標平面上で、比例 y = x のグラフと反比例 y = 9/x のグラフが交わる点のうち、x座標が正であるものの座標を求めなさい。", options: ["(1, 9)", "(9, 1)", "(3, 3)", "交わらない"], answer: 2, explanation: "交点ではyの値が等しいので、x = 9/x という方程式が成り立ちます。両辺にxを掛けて x² = 9。x>0なので x=3。y=xに代入してy=3。よって交点は(3, 3)です。" }
+        ];
+        // ▲▲▲ ここまで単元の設定 ▲▲▲
+
+
+         const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="option">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selected ? parseInt(selected.value) : -1;
+                const isCorrect = userAnswer === item.answer;
+                
+                userAnswers.push({
+                    question: item.q,
+                    options: item.options,
+                    userAnswer: userAnswer,
+                    correctAnswer: item.answer,
+                    isCorrect: isCorrect,
+                    explanation: item.explanation
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+            });
+            
+            displayResults(score, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const totalQuestions = quizData.length;
+            const finalScore = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。自信を持って次のステップに進みましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "全体的によく理解できています。不正解だった問題を復習すれば、さらに実力がアップします。";
+            } else if (finalScore >= 50) {
+                evalTitleEl.textContent = "もう少し！";
+                evalBodyEl.textContent = "基本的な内容は理解できています。不正解の問題には、あなたの弱点が隠されています。解説を読んでしっかり復習しましょう。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "この単元は苦手な部分が多いようです。焦らず、解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                const userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                const correctAnswerText = item.options[item.correctAnswer];
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    const reviewHtml = `
+                        <div class="review-item correct">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText} (正解)</p>
+                            </div>
+                        </div>
+                    `;
+                    correctContainer.innerHTML += reviewHtml;
+                } else {
+                    incorrectCount++;
+                    const reviewHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解: ${correctAnswerText}</strong></p>
+                                <div class="explanation-toggle">解説を見る</div>
+                            </div>
+                            <div class="explanation">
+                                <p>${item.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    incorrectContainer.innerHTML += reviewHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active');
+                inactiveSection.classList.remove('active');
+            }
+
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    if (isVisible) {
+                        explanation.style.maxHeight = '0';
+                    } else {
+                        explanation.style.maxHeight = explanation.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

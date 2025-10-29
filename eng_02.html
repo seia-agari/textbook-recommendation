@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中1英語 | 2.三人称単数現在形 </title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        /* 新しい問題形式のスタイル */
+        .sortable-options { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+        .sortable-option { padding: 8px 15px; background: #e9ecef; border-radius: 6px; cursor: pointer; user-select: none; }
+        .sortable-answer-area { min-height: 50px; background: #f8f9fa; border: 2px dashed var(--border-color); border-radius: 8px; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .long-text-passage { background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 20px; line-height: 1.8; }
+        .essay-textarea { width: 100%; min-height: 100px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; font-family: var(--font-family); }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 英語</div>
+                    <h1>2. 三人称単数現在形</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ▼▼▼ ここから単元の設定 ▼▼▼
+const quizData = [
+    // 4択問題 (15問)
+    { type: "choice", q: "次の文の( )に適切な語を入れなさい。<br>He ( ) soccer every Sunday.", options: ["play", "plays", "playing", "played"], answer: 1, explanation: "主語が He (三人称単数) のとき、一般動詞には s をつけて plays になります。" },
+    { type: "choice", q: "次の文の( )に適切な語を入れなさい。<br>She ( ) English very well.", options: ["speak", "speaks", "speaking", "spoke"], answer: 1, explanation: "主語が She のとき、動詞 speak に s をつけて speaks にします。" },
+    { type: "choice", q: "次の文の( )に適切な語を入れなさい。<br>My father ( ) to work by car.", options: ["go", "goes", "going", "gone"], answer: 1, explanation: "主語が My father（彼）なので、動詞 go に es をつけて goes になります。" },
+    { type: "choice", q: "次の文を否定文にしなさい。<br>He plays tennis.", options: ["He don't play tennis.", "He doesn't play tennis.", "He not plays tennis.", "He isn't play tennis."], answer: 1, explanation: "三人称単数の否定文では doesn't を使い、動詞は原形に戻します。" },
+    { type: "choice", q: "次の文を疑問文にしなさい。<br>She likes music.", options: ["Does she like music?", "Do she like music?", "Is she like music?", "She does like music?"], answer: 0, explanation: "三人称単数の一般動詞の疑問文では Does を文の最初に置き、動詞は原形にします。" },
+    { type: "choice", q: "次の文の( )に適切な語を入れなさい。<br>It ( ) not rain today.", options: ["do", "does", "doesn't", "don't"], answer: 2, explanation: "It が主語で、否定文のときは doesn't を使います。" },
+    { type: "choice", q: "主語が三人称単数のとき、動詞に s/es をつけないものはどれ？", options: ["一般動詞", "be動詞", "助動詞", "命令文"], answer: 3, explanation: "命令文では動詞に s/es はつけません。命令文は主語を省略します。" },
+    { type: "choice", q: "He ( ) to school at 8 every morning.", options: ["go", "goes", "going", "gone"], answer: 1, explanation: "主語が He のとき、動詞 go に es をつけて goes になります。" },
+    { type: "choice", q: "My sister ( ) TV after dinner.", options: ["watch", "watches", "watchs", "watching"], answer: 1, explanation: "子音字＋chで終わる動詞は、esをつけてwatchesになります。" },
+    { type: "choice", q: "Tom and Ken ( ) baseball after school.", options: ["plays", "play", "playing", "played"], answer: 1, explanation: "主語が複数(Tom and Ken)なので、動詞に s はつけません。" },
+    { type: "choice", q: "Does she ( ) coffee every morning?", options: ["drink", "drinks", "drinking", "to drink"], answer: 0, explanation: "Does を使う疑問文では、動詞は原形の drink にします。" },
+    { type: "choice", q: "次の文の正しい答えを選びなさい。<br>Does he like soccer?", options: ["Yes, he does.", "Yes, he do.", "Yes, he likes.", "Yes, he is."], answer: 0, explanation: "Does he...? で聞かれたら、Yes, he does. / No, he doesn't. で答えます。" },
+    { type: "choice", q: "study の三人称単数形はどれ？", options: ["studys", "studies", "studyies", "study"], answer: 1, explanation: "子音字 + y で終わる動詞は、y を i に変えて es をつけます。" },
+    { type: "choice", q: "She ( ) lunch at 12.", options: ["has", "have", "having", "haves"], answer: 0, explanation: "have の三人称単数形は has です。" },
+    { type: "choice", q: "He ( ) his homework every night.", options: ["do", "does", "doing", "done"], answer: 1, explanation: "主語が He なので、動詞 do に es をつけて does になります。" },
+
+    // 並び替え問題 (2問)
+    { type: "sort", q: "次の語を並べ替えて、「彼は毎朝コーヒーを飲みます。」という文を作りなさい。", options: ["drinks", "he", "coffee", "every", "morning", "."], answer: "he drinks coffee every morning .", explanation: "主語が He のとき、動詞 drink に s をつけて drinks にします。" },
+    { type: "sort", q: "次の語を並べ替えて、「彼女は上手にピアノを弾きます。」という文を作りなさい。", options: ["plays", "she", "the", "piano", "well", "."], answer: "she plays the piano well .", explanation: "主語が She のとき、動詞 play に s をつけて plays にします。" },
+    
+    // 長文読解問題 (2問)
+    { type: "passage", 
+      passage: "Tom gets up at six every morning. He eats breakfast and goes to school. He likes soccer and plays it after school. He studies English and math at school.",
+      q: "本文の内容と合っているものを1つ選びなさい。", 
+      options: [
+          "トムは朝7時に起きます。", 
+          "トムは朝食を食べません。", 
+          "トムは放課後にサッカーをします。", 
+          "トムは英語と理科を勉強します。"
+      ], 
+      answer: 2,
+      explanation: "本文に 'He plays it after school.' とあるので、「放課後にサッカーをする」が正解です。"
+    },
+    { type: "passage", 
+      passage: "Tom gets up at six every morning. He eats breakfast and goes to school. He likes soccer and plays it after school. He studies English and math at school.",
+      q: "本文の内容について、次の質問に英語で答えなさい。<br>What does Tom play after school?", 
+      options: [
+          "He plays the piano.", 
+          "He plays baseball.", 
+          "He plays soccer.", 
+          "He plays games."
+      ], 
+      answer: 2,
+      explanation: "本文の 'He likes soccer and plays it after school.' より、正解は He plays soccer. です。"
+    },
+
+    // 英作文問題 (1問)
+    { type: "essay", q: "「彼は毎日テレビを見ます。」という文を英語で書きなさい。", answer: "He watches TV every day.", explanation: "主語が He のとき、watch に es をつけて watches にします。「毎日」は every day です。" }
+];
+// ▲▲▲ ここまで単元の設定 ▲▲▲
+
+        const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            let contentHtml = '';
+            switch (item.type) {
+                case 'choice':
+                    contentHtml = item.options.map((option, i) => `
+                        <label class="option"><input type="radio" name="q${index}" value="${i}"><span>${option}</span></label>
+                    `).join('');
+                    break;
+                case 'sort':
+                    contentHtml = `
+                        <div class="sortable-options" id="q${index}-options">
+                            ${item.options.map(opt => `<span class="sortable-option">${opt}</span>`).join('')}
+                        </div>
+                        <div class="sortable-answer-area" id="q${index}-answer"></div>
+                        <input type="hidden" name="q${index}">
+                    `;
+                    break;
+                case 'passage':
+                    contentHtml = `
+                        <div class="long-text-passage">${item.passage}</div>
+                        ${item.options.map((option, i) => `<label class="option"><input type="radio" name="q${index}" value="${i}"><span>${option}</span></label>`).join('')}
+                    `;
+                    break;
+                case 'essay':
+                    contentHtml = `<textarea name="q${index}" class="essay-textarea" placeholder="ここに英文を入力してください"></textarea>`;
+                    break;
+            }
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${contentHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 並び替え問題のUIロジック
+        document.querySelectorAll('.sortable-options').forEach(optionsContainer => {
+            const answerContainer = optionsContainer.nextElementSibling;
+            const hiddenInput = answerContainer.nextElementSibling;
+
+            optionsContainer.addEventListener('click', e => {
+                if (e.target.classList.contains('sortable-option')) {
+                    answerContainer.appendChild(e.target);
+                    updateSortableAnswer();
+                }
+            });
+            answerContainer.addEventListener('click', e => {
+                if (e.target.classList.contains('sortable-option')) {
+                    optionsContainer.appendChild(e.target);
+                    updateSortableAnswer();
+                }
+            });
+
+            function updateSortableAnswer() {
+                const words = Array.from(answerContainer.children).map(child => child.textContent);
+                hiddenInput.value = words.join(' ');
+            }
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            let scoredQuestions = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                let userAnswer, isCorrect = false;
+                
+                switch (item.type) {
+                    case 'choice':
+                    case 'passage':
+                        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                        userAnswer = selected ? parseInt(selected.value) : -1;
+                        isCorrect = userAnswer === item.answer;
+                        scoredQuestions++;
+                        break;
+                    case 'sort':
+                        userAnswer = document.querySelector(`input[name="q${index}"]`).value;
+                        isCorrect = userAnswer.toLowerCase().replace(/\s/g, '') === item.answer.toLowerCase().replace(/\s/g, '');
+                        scoredQuestions++;
+                        break;
+                    case 'essay':
+                        userAnswer = document.querySelector(`textarea[name="q${index}"]`).value;
+                        isCorrect = null; 
+                        break;
+                }
+                
+                userAnswers.push({ type: item.type, q: item.q, passage: item.passage, options: item.options, userAnswer: userAnswer, answer: item.answer, isCorrect: isCorrect, explanation: item.explanation });
+                if (isCorrect) score++;
+            });
+            
+            displayResults(score, scoredQuestions, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, scoredQuestions, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const finalScore = scoredQuestions > 0 ? Math.round((score / scoredQuestions) * 100) : 0;
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。英作文も模範解答と見比べてみましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "選択問題はよく理解できています。不正解の問題と英作文を復習すれば、さらに実力がアップします。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "苦手な部分が多いようです。解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                let userAnswerText, correctAnswerText, resultHtml;
+                
+                switch (item.type) {
+                    case 'choice':
+                    case 'passage':
+                        userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                        correctAnswerText = item.options[item.answer];
+                        break;
+                    case 'sort':
+                    case 'essay':
+                        userAnswerText = item.userAnswer || '未回答';
+                        correctAnswerText = item.answer;
+                        break;
+                }
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    resultHtml = `<div class="review-item correct"><div class="review-item-content"><p><strong>問${index + 1}. ${item.q.replace(/<br>/g, ' ')}</strong></p><p>あなたの回答: ${userAnswerText} (正解)</p></div></div>`;
+                    correctContainer.innerHTML += resultHtml;
+                } else {
+                    incorrectCount++;
+                    let explanationToggle = item.type !== 'essay' ? `<div class="explanation-toggle">解説を見る</div>` : '';
+                    resultHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.q.replace(/<br>/g, ' ')}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解 / 模範解答: ${correctAnswerText}</strong></p>
+                                ${explanationToggle}
+                            </div>
+                            ${item.explanation ? `<div class="explanation"><p>${item.explanation}</p></div>` : ''}
+                        </div>`;
+                    incorrectContainer.innerHTML += resultHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active'); inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active'); inactiveSection.classList.remove('active');
+            }
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    explanation.style.maxHeight = isVisible ? '0' : explanation.scrollHeight + 'px';
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中1数学 | 2. 文字と式</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSSスタイルはmath_01.htmlと全く同じなので、ここでは省略します。 */
+        /* 実際のファイルでは、math_01.htmlの<style>タグの中身をここにコピーしてください。 */
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 数学</div>
+                    <h1>2. 文字と式</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ▼▼▼ ここから単元の設定 ▼▼▼
+        const quizData = [
+            { q: "x × y × (-2) を文字式のルールに従って表しなさい。", options: ["xy(-2)", "-2xy", "x-2y", "-2(x+y)"], answer: 1, explanation: "文字式では、数は文字の前に置き、×の記号は省略します。" },
+            { q: "(a + b) ÷ 5 を文字式のルールに従って表しなさい。", options: ["a+b/5", "(a+b)/5", "5(a+b)", "a/5 + b"], answer: 1, explanation: "÷の記号は分数の形で表します。括弧がついているので、a+b全体が分子になります。" },
+            { q: "x = -3 のとき、5 - 4x の値を求めなさい。", options: ["-7", "17", "7", "-17"], answer: 1, explanation: "xに-3を代入します。5 - 4×(-3) = 5 - (-12) = 5 + 12 = 17 となります。" },
+            { q: "a = 2, b = -4 のとき、3a - 2b の値を求めなさい。", options: ["-2", "14", "2", "-14"], answer: 1, explanation: "a=2, b=-4を代入します。3×2 - 2×(-4) = 6 - (-8) = 6 + 8 = 14 となります。" },
+            { q: "次の計算をせよ。<br>5x - 8 - 2x + 3", options: ["3x - 5", "7x - 11", "3x + 5", "7x + 11"], answer: 0, explanation: "文字の項(5xと-2x)と数の項(-8と+3)をそれぞれまとめます。 (5-2)x + (-8+3) = 3x - 5。" },
+            { q: "次の計算をせよ。<br>(4a - 7) + (-a + 2)", options: ["5a - 9", "3a - 5", "3a + 5", "5a + 9"], answer: 1, explanation: "括弧を外して、同類項をまとめます。4a - 7 - a + 2 = (4-1)a + (-7+2) = 3a - 5。" },
+            { q: "次の計算をせよ。<br>(6x + 1) - (2x - 5)", options: ["4x - 4", "8x - 6", "4x - 6", "4x + 6"], answer: 3, explanation: "引く方の括弧を外すとき、中の符号がすべて逆になります。6x + 1 - 2x + 5 = (6-2)x + (1+5) = 4x + 6。" },
+            { q: "次の計算をせよ。<br>3(2x - 5)", options: ["6x - 5", "5x - 2", "6x - 15", "2x - 15"], answer: 2, explanation: "分配法則を使って、括弧の中の項すべてに3を掛けます。3×2x + 3×(-5) = 6x - 15。" },
+            { q: "次の計算をせよ。<br>(-12y + 8) ÷ 4", options: ["-3y + 2", "-8y + 4", "3y + 2", "-48y + 32"], answer: 0, explanation: "括弧の中の項すべてを4で割ります。(-12y)÷4 + 8÷4 = -3y + 2。" },
+            { q: "1個a円のリンゴを5個買ったときの代金を文字式で表しなさい。", options: ["a + 5", "5a", "a - 5", "a ÷ 5"], answer: 1, explanation: "代金は (1個の値段) × (個数) で求められます。" },
+            { q: "x人の生徒に鉛筆を1人3本ずつ配ったところ、5本余った。このときの鉛筆の総数を文字式で表しなさい。", options: ["3x - 5", "5x + 3", "3x + 5", "x/3 + 5"], answer: 2, explanation: "配った鉛筆の数は 3×x = 3x 本。それに余った5本を足すので、総数は 3x + 5 本です。" },
+            { q: "定価y円の品物を3割引で買ったときの値段を文字式で表しなさい。", options: ["0.3y", "y - 3", "0.7y", "y/3"], answer: 2, explanation: "3割引とは、定価の (1 - 0.3) = 0.7倍の値段ということです。よって 0.7y 円となります。" },
+            { q: "a kmの道のりを時速4 kmで歩いたときにかかる時間を文字式で表しなさい。", options: ["4a", "a/4", "a-4", "a+4"], answer: 1, explanation: "時間は (道のり) ÷ (速さ) で求められます。" },
+            { q: "「xは5以上である」という関係を不等式で表しなさい。", options: ["x > 5", "x < 5", "x ≧ 5", "x ≦ 5"], answer: 2, explanation: "「以上」はその数を含むので、≧ の記号を使います。" },
+            { q: "次の式の項を答えなさい。<br>2a - b + 7", options: ["2a, b, 7", "2a, -b, 7", "2, -1, 7", "a, b"], answer: 1, explanation: "項は、＋で結ばれたそれぞれの部分です。2a - b + 7 は 2a + (-b) + 7 と考えます。" },
+            { q: "3x - 5 の x の係数は？", options: ["3", "-5", "3x", "x"], answer: 0, explanation: "係数とは、文字に掛けられている数のことです。" },
+            { q: "次のうち、一次式はどれ？", options: ["x² + 2", "3x - 7", "5", "x/y"], answer: 1, explanation: "一次式とは、文字が1回だけ掛けられている項を含む式のことです。x²は二次なので違います。" },
+            { q: "1000円出して、1個x円のパンを5個買ったときのおつりを文字式で表しなさい。", options: ["1000 - 5x", "5x - 1000", "1000 + 5x", "1000x - 5"], answer: 0, explanation: "おつりは (出したお金) - (代金) で求められます。代金は 5x 円です。" },
+            { q: "縦がa cm、横がb cmの長方形の面積をSとする時、この関係を等式で表しなさい。", options: ["S = a + b", "S = 2(a+b)", "S = ab", "a = Sb"], answer: 2, explanation: "長方形の面積は (縦) × (横) で求められます。" },
+            { q: "(9x - 6) / 3 を計算しなさい。", options: ["3x - 2", "9x - 2", "3x - 6", "6x - 3"], answer: 0, explanation: "分子の各項を分母の3で割ります。9x÷3 - 6÷3 = 3x - 2 となります。" }
+        ];
+        // ▲▲▲ ここまで単元の設定 ▲▲▲
+
+         const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="option">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selected ? parseInt(selected.value) : -1;
+                const isCorrect = userAnswer === item.answer;
+                
+                userAnswers.push({
+                    question: item.q,
+                    options: item.options,
+                    userAnswer: userAnswer,
+                    correctAnswer: item.answer,
+                    isCorrect: isCorrect,
+                    explanation: item.explanation
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+            });
+            
+            displayResults(score, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const totalQuestions = quizData.length;
+            const finalScore = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。自信を持って次のステップに進みましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "全体的によく理解できています。不正解だった問題を復習すれば、さらに実力がアップします。";
+            } else if (finalScore >= 50) {
+                evalTitleEl.textContent = "もう少し！";
+                evalBodyEl.textContent = "基本的な内容は理解できています。不正解の問題には、あなたの弱点が隠されています。解説を読んでしっかり復習しましょう。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "この単元は苦手な部分が多いようです。焦らず、解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                const userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                const correctAnswerText = item.options[item.correctAnswer];
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    const reviewHtml = `
+                        <div class="review-item correct">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText} (正解)</p>
+                            </div>
+                        </div>
+                    `;
+                    correctContainer.innerHTML += reviewHtml;
+                } else {
+                    incorrectCount++;
+                    const reviewHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解: ${correctAnswerText}</strong></p>
+                                <div class="explanation-toggle">解説を見る</div>
+                            </div>
+                            <div class="explanation">
+                                <p>${item.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    incorrectContainer.innerHTML += reviewHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active');
+                inactiveSection.classList.remove('active');
+            }
+
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    if (isVisible) {
+                        explanation.style.maxHeight = '0';
+                    } else {
+                        explanation.style.maxHeight = explanation.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中1数学 | 3. 一次方程式</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSSスタイルはmath_01.htmlと全く同じなので、ここでは省略します。 */
+        /* 実際のファイルでは、math_01.htmlの<style>タグの中身をここにコピーしてください。 */
+        :root {
+            --bg-color: #f8f9fa; --main-color: #ffffff; --primary-color: #F97316;
+            --text-color: #1f2937; --subtext-color: #6b7280; --border-color: #e5e7eb;
+            --font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            --success-color: #10B981; --danger-color: #EF4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family); color: var(--text-color); line-height: 1.7;
+            margin: 0; background: var(--bg-color);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .header {
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 16px 0;
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .header-content { display: flex; justify-content: center; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-color); text-decoration: none; }
+        .logo span { color: var(--primary-color); }
+        .main-content { padding: 40px 0 80px; }
+        .quiz-header {
+            text-align: center; margin-bottom: 30px; padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .quiz-header .breadcrumb { color: var(--subtext-color); margin-bottom: 10px; font-size: 0.9rem; }
+        .quiz-header .breadcrumb a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+        .quiz-header h1 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+        
+        .quiz-item {
+            background: var(--main-color); border: 1px solid var(--border-color);
+            border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+        }
+        .question-title { display: flex; align-items: center; font-size: 1.1rem; font-weight: 700; margin: 0 0 20px; }
+        .question-title span { color: var(--primary-color); margin-right: 15px; font-size: 1.2rem; }
+        .options { display: grid; gap: 15px; }
+        .option {
+            display: block; background: #f9fafb; border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary-color); background: #fff7ed; }
+        .option input { margin-right: 10px; }
+        
+        .submit-button-wrapper { text-align: center; margin-top: 40px; }
+        .submit-button {
+            background: var(--primary-color); color: white; border: none; padding: 15px 40px;
+            border-radius: 50px; font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 7px 25px rgba(249, 115, 22, 0.4); }
+        
+        #result-area { display: none; }
+        .result-summary {
+            text-align: center; margin-bottom: 50px; background: var(--main-color);
+            padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .result-summary .score { font-size: 4rem; font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+        .result-summary .score-label { font-size: 1.2rem; color: var(--subtext-color); margin-bottom: 20px; }
+        #evaluation-comment h3 { font-size: 1.5rem; margin: 0 0 10px; }
+        #evaluation-comment p { color: var(--subtext-color); margin: 0; }
+        
+        .review-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+        }
+        .review-tab-button {
+            padding: 10px 20px; background: transparent; border: none;
+            font-size: 1rem; font-weight: 600; color: var(--subtext-color);
+            cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -1px;
+        }
+        .review-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .review-section { display: none; }
+        .review-section.active { display: block; }
+
+        .review-item {
+            background: var(--main-color); border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+        }
+        .review-item-content { padding: 20px; border-left: 5px solid; }
+        .review-item.correct .review-item-content { border-left-color: var(--success-color); }
+        .review-item.incorrect .review-item-content { border-left-color: var(--danger-color); }
+        .review-item p { margin: 8px 0; }
+        .explanation-toggle {
+            display: inline-block; background: #fff3e0; color: #d97706;
+            padding: 5px 15px; border-radius: 50px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; font-size: 0.9rem;
+        }
+        .explanation {
+            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
+            background: #fffbeB; border-top: 1px solid #fee2e2;
+            border-radius: 0 0 7px 7px;
+        }
+        .explanation p { padding: 15px 20px; margin: 0; }
+        
+        .footer { padding: 40px 0; background: var(--main-color); border-top: 1px solid var(--border-color); text-align: center; color: var(--subtext-color); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .main-content { padding: 30px 0 60px; }
+            .quiz-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">単元テスト<span>集</span></a>
+            </div>
+        </div>
+    </header>
+
+     <main class="main-content">
+        <div class="container">
+            <!-- テスト問題エリア -->
+            <div id="quiz-area">
+                <div class="quiz-header">
+                    <div class="breadcrumb"><a href="test.html">ホーム</a> &gt; 数学</div>
+                    <h1>3. 一次方程式</h1>
+                </div>
+                <form id="quiz-form">
+                    <!-- 問題はここにJavaScriptで挿入されます -->
+                </form>
+                <div class="submit-button-wrapper">
+                    <button id="submit-btn" class="submit-button" type="button">採点する</button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div id="result-area">
+                <div class="result-summary">
+                    <div class="score-label">あなたの得点は...</div>
+                    <div id="score" class="score">100<span>点</span></div>
+                    <div id="evaluation-comment">
+                        <h3 id="eval-title"></h3>
+                        <p id="eval-body"></p>
+                    </div>
+                </div>
+                
+                <div class="review-tabs">
+                    <button id="show-incorrect" class="review-tab-button">不正解の問題</button>
+                    <button id="show-correct" class="review-tab-button">正解した問題</button>
+                </div>
+
+                <div id="incorrect-section" class="review-section">
+                    <div id="incorrect-answers"></div>
+                </div>
+
+                <div id="correct-section" class="review-section">
+                    <div id="correct-answers"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container"><p>&copy; 2025 単元テスト集</p></div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ▼▼▼ ここから単元の設定 ▼▼▼
+        const quizData = [
+            { q: "方程式 x + 5 = 8 を解きなさい。", options: ["x = 3", "x = -3", "x = 13", "x = -13"], answer: 0, explanation: "左辺の+5を右辺に移項すると-5になります。x = 8 - 5 なので、x = 3 です。" },
+            { q: "方程式 4x = -12 を解きなさい。", options: ["x = -8", "x = 8", "x = 3", "x = -3"], answer: 3, explanation: "両辺をxの係数である4で割ります。x = -12 ÷ 4 なので、x = -3 です。" },
+            { q: "方程式 3x - 2 = 10 を解きなさい。", options: ["x = 4", "x = -4", "x = 8/3", "x = 12"], answer: 0, explanation: "-2を右辺に移項して+2にします。3x = 10 + 2 = 12。両辺を3で割って x = 4 です。" },
+            { q: "方程式 5x = 2x + 9 を解きなさい。", options: ["x = 9/7", "x = -3", "x = 3", "x = 9"], answer: 2, explanation: "2xを左辺に移項して-2xにします。5x - 2x = 9。3x = 9 となり、両辺を3で割って x = 3 です。" },
+            { q: "方程式 2x - 8 = 7x + 2 を解きなさい。", options: ["x = 2", "x = -2", "x = 10/9", "x = -10/9"], answer: 1, explanation: "7xを左辺に、-8を右辺に移項します。2x - 7x = 2 + 8。-5x = 10 となり、両辺を-5で割って x = -2 です。" },
+            { q: "方程式 4(x - 3) = 8 を解きなさい。", options: ["x = 5", "x = -1", "x = 2", "x = 4"], answer: 0, explanation: "まず括弧を外します。4x - 12 = 8。-12を移項して 4x = 20。両辺を4で割って x = 5 です。" },
+            { q: "方程式 3(x + 1) = 2(x + 5) を解きなさい。", options: ["x = 4", "x = 7", "x = 2", "x = -2"], answer: 1, explanation: "両辺の括弧を外します。3x + 3 = 2x + 10。移項して 3x - 2x = 10 - 3。よって x = 7 です。" },
+            { q: "方程式 0.5x + 1.2 = 3.2 を解きなさい。", options: ["x = 4", "x = 2", "x = 8.8", "x = 1"], answer: 0, explanation: "計算しやすくするため、両辺を10倍します。5x + 12 = 32。移項して 5x = 20。両辺を5で割って x = 4 です。" },
+            { q: "方程式 x/3 + 2 = 5 を解きなさい。", options: ["x = 9", "x = 21", "x = 1", "x = 3"], answer: 0, explanation: "+2を移項します。x/3 = 3。両辺に3を掛けて x = 9 です。" },
+            { q: "方程式 x/2 = x/3 + 1 を解きなさい。", options: ["x = 1", "x = 6", "x = -6", "x = 5"], answer: 1, explanation: "分母をなくすため、両辺に分母の最小公倍数である6を掛けます。3x = 2x + 6。移項して x = 6 です。" },
+            { q: "比例式 x : 4 = 6 : 8 を解きなさい。", options: ["x = 3", "x = 2", "x = 4.8", "x = 12"], answer: 0, explanation: "比例式の性質「内項の積＝外項の積」を使います。8x = 4 × 6 = 24。両辺を8で割って x = 3 です。" },
+            { q: "ある数xを3倍して5を足すと26になる。xはいくつか。", options: ["7", "8", "9", "6"], answer: 0, explanation: "問題文を方程式にすると 3x + 5 = 26。移項して 3x = 21。両辺を3で割って x = 7 です。" },
+            { q: "連続する3つの整数の和が51であるとき、最も小さい整数は何か。", options: ["15", "16", "17", "18"], answer: 1, explanation: "中央の数をxとすると、3つの整数は x-1, x, x+1 と表せます。和が51なので (x-1)+x+(x+1) = 51。3x = 51 となり x = 17。最も小さい数は x-1 = 16 です。" },
+            { q: "1個80円のりんごと1個50円のみかんを合わせて10個買い、代金が620円だった。りんごは何個買ったか。", options: ["4個", "5個", "6個", "7"], answer: 0, explanation: "りんごをx個とすると、みかんは(10-x)個。代金の式は 80x + 50(10-x) = 620。これを解くと 30x = 120 となり x = 4 です。" },
+            { q: "方程式 2x - a = 8 の解が x = 5 のとき、aの値を求めなさい。", options: ["a = 2", "a = -2", "a = 18", "a = -18"], answer: 0, explanation: "方程式に x = 5 を代入します。2×5 - a = 8。10 - a = 8。これを解くと a = 2 です。" },
+            { q: "「xについての方程式」とは何か。", options: ["xの値によって成り立ったり成り立たなかったりする等式", "xがどんな値でも常に成り立つ等式", "xを含む不等式", "xの値を求めること"], answer: 0, explanation: "特定のxの値のときだけ成り立つ等式を方程式といいます。常に成り立つ等式は恒等式です。" },
+            { q: "方程式を解くとき、両辺に同じ数を足しても等式は成り立つ。この性質を何というか。", options: ["交換法則", "結合法則", "分配法則", "等式の性質"], answer: 3, explanation: "等式の両辺に同じ操作をしても等式が成り立つことを「等式の性質」といいます。" },
+            { q: "方程式 7 - x = 10 を解きなさい。", options: ["x = 3", "x = -3", "x = 17", "x = -17"], answer: 1, explanation: "7を右辺に移項すると -x = 10 - 7 = 3。両辺に-1を掛けて x = -3 です。" },
+            { q: "弟が家を出発してから5分後に、兄が分速80mで追いかけた。弟の速さを分速60mとすると、兄は出発してから何分後に弟に追いつくか。", options: ["10分後", "15分後", "20分後", "25分後"], answer: 1, explanation: "兄が出発してからx分後に追いつくとすると、兄が進んだ距離は80x。弟は(x+5)分歩いているので、距離は60(x+5)。80x = 60(x+5) を解くと x = 15 です。" },
+            { q: "5%の食塩水200gに、10%の食塩水を何g加えると、8%の食塩水になるか。", options: ["200g", "250g", "300g", "350g"], answer: 2, explanation: "10%の食塩水をxgとします。食塩の量に着目すると、200×0.05 + x×0.10 = (200+x)×0.08。これを解くと 10 + 0.1x = 16 + 0.08x。0.02x = 6 となり x = 300 です。" }
+        ];
+        // ▲▲▲ ここまで単元の設定 ▲▲▲
+
+
+         const quizForm = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // 問題をHTMLに描画
+        quizData.forEach((item, index) => {
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="option">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+            
+            const questionHtml = `
+                <div class="quiz-item">
+                    <h2 class="question-title"><span>Q${index + 1}</span>${item.q}</h2>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            `;
+            quizForm.innerHTML += questionHtml;
+        });
+
+        // 採点ボタンのクリックイベント
+        submitBtn.addEventListener('click', function() {
+            let score = 0;
+            const userAnswers = [];
+
+            quizData.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selected ? parseInt(selected.value) : -1;
+                const isCorrect = userAnswer === item.answer;
+                
+                userAnswers.push({
+                    question: item.q,
+                    options: item.options,
+                    userAnswer: userAnswer,
+                    correctAnswer: item.answer,
+                    isCorrect: isCorrect,
+                    explanation: item.explanation
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+            });
+            
+            displayResults(score, userAnswers);
+        });
+
+        // 結果表示機能
+        function displayResults(score, userAnswers) {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            const totalQuestions = quizData.length;
+            const finalScore = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').innerHTML = `${finalScore}<span>点</span>`;
+            
+            const evalTitleEl = document.getElementById('eval-title');
+            const evalBodyEl = document.getElementById('eval-body');
+            if(finalScore >= 90) {
+                evalTitleEl.textContent = "素晴らしい！";
+                evalBodyEl.textContent = "この単元は完璧です。自信を持って次のステップに進みましょう。";
+            } else if (finalScore >= 70) {
+                evalTitleEl.textContent = "よくできました！";
+                evalBodyEl.textContent = "全体的によく理解できています。不正解だった問題を復習すれば、さらに実力がアップします。";
+            } else if (finalScore >= 50) {
+                evalTitleEl.textContent = "もう少し！";
+                evalBodyEl.textContent = "基本的な内容は理解できています。不正解の問題には、あなたの弱点が隠されています。解説を読んでしっかり復習しましょう。";
+            } else {
+                evalTitleEl.textContent = "基礎から復習しよう";
+                evalBodyEl.textContent = "この単元は苦手な部分が多いようです。焦らず、解説をよく読んで一つずつ理解していくことが大切です。";
+            }
+
+            const correctContainer = document.getElementById('correct-answers');
+            const incorrectContainer = document.getElementById('incorrect-answers');
+            correctContainer.innerHTML = '';
+            incorrectContainer.innerHTML = '';
+            
+            let correctCount = 0;
+            let incorrectCount = 0;
+
+            userAnswers.forEach((item, index) => {
+                const userAnswerText = item.userAnswer !== -1 ? item.options[item.userAnswer] : '未回答';
+                const correctAnswerText = item.options[item.correctAnswer];
+
+                if(item.isCorrect) {
+                    correctCount++;
+                    const reviewHtml = `
+                        <div class="review-item correct">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText} (正解)</p>
+                            </div>
+                        </div>
+                    `;
+                    correctContainer.innerHTML += reviewHtml;
+                } else {
+                    incorrectCount++;
+                    const reviewHtml = `
+                        <div class="review-item incorrect">
+                            <div class="review-item-content">
+                                <p><strong>問${index + 1}. ${item.question}</strong></p>
+                                <p>あなたの回答: ${userAnswerText}</p>
+                                <p style="color:var(--primary-color)"><strong>正解: ${correctAnswerText}</strong></p>
+                                <div class="explanation-toggle">解説を見る</div>
+                            </div>
+                            <div class="explanation">
+                                <p>${item.explanation}</p>
+                            </div>
+                        </div>
+                    `;
+                    incorrectContainer.innerHTML += reviewHtml;
+                }
+            });
+
+            const showIncorrectBtn = document.getElementById('show-incorrect');
+            const showCorrectBtn = document.getElementById('show-correct');
+            const incorrectSection = document.getElementById('incorrect-section');
+            const correctSection = document.getElementById('correct-section');
+
+            function switchTab(activeBtn, inactiveBtn, activeSection, inactiveSection) {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activeSection.classList.add('active');
+                inactiveSection.classList.remove('active');
+            }
+
+            showIncorrectBtn.addEventListener('click', () => switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection));
+            showCorrectBtn.addEventListener('click', () => switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection));
+            
+            if (incorrectCount > 0) {
+                switchTab(showIncorrectBtn, showCorrectBtn, incorrectSection, correctSection);
+            } else {
+                switchTab(showCorrectBtn, showIncorrectBtn, correctSection, incorrectSection);
+            }
+            
+            document.querySelectorAll('.explanation-toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const explanation = toggle.parentElement.nextElementSibling;
+                    const isVisible = explanation.style.maxHeight && explanation.style.maxHeight !== '0px';
+                    if (isVisible) {
+                        explanation.style.maxHeight = '0';
+                    } else {
+                        explanation.style.maxHeight = explanation.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>
