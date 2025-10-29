@@ -6,8 +6,76 @@
     <title>学力診断 & 教材レコメンド</title>
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="style.css">
+
+    <!-- ▼ プライバシーポリシーモーダルのためのCSS -->
+    <style>
+        /* モーダルの背景 */
+        .privacy-modal-overlay {
+            display: none; /* 初期状態では非表示 */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5); /* 半透明の黒 */
+        }
+
+        /* モーダルのコンテンツ部分 */
+        .privacy-modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 上下10%のマージン、左右は自動で中央揃え */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        /* 閉じるボタン */
+        .privacy-modal-close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .privacy-modal-close-btn:hover,
+        .privacy-modal-close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* フッターのスタイル */
+        .app-footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #888;
+        }
+        .privacy-link {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #555;
+        }
+        .privacy-link:hover {
+            color: #000;
+        }
+    </style>
+    <!-- ▲ CSSここまで -->
+
 </head>
 <body>
+    
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="main-container">
         <div id="app-pane" class="app-pane">
@@ -23,6 +91,14 @@
                         <button id="start-test-btn" class="btn">学力診断テストを受ける</button>
                         <button id="start-recommend-btn" class="btn secondary">自分で教材を探す</button>
                     </div>
+
+                    <!-- ▼ 1ページ目のフッターとプライバシーポリシー -->
+                    <footer class="app-footer">
+                        <span>&copy; smile study</span>
+                        <span class="privacy-link">プライバシーポリシー</span>
+                    </footer>
+                    <!-- ▲ ここまで -->
+
                 </div>
             </div>
             
@@ -38,14 +114,18 @@
                         <div class="form-group"><label for="subject">科目:</label><select id="subject" name="subject"><option value="english">英語</option><option value="math">数学</option></select></div>
                         <button type="submit" class="btn">テストを開始</button>
                     </form>
-                      <!-- ここから追加 -->
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                         <h2>単元ごとテスト</h2>
                         <p>特定の単元を選んでテストをしたい場合はこちらからどうぞ。</p>
-                        <!-- 'unit-test.html'という名前の別ファイルに移動します -->
                         <a href="test.html" class="btn secondary" style="text-decoration: none; display: block; text-align: center;">単元ごとテストのページへ</a>
                     </div>
-                    <!-- ここまで追加 -->
+
+                    <!-- ▼ 2ページ目のフッターとプライバシーポリシー -->
+                    <footer class="app-footer">
+                        <span>&copy; smile study</span>
+                        <span class="privacy-link">プライバシーポリシー</span>
+                    </footer>
+                    <!-- ▲ ここまで -->
                 </div>
             </div>
 
@@ -118,7 +198,7 @@
                       <footer style="display:flex; justify-content:space-between; align-items: center; position:relative; font-size:14px;">
                         <button id="back-to-home-from-rec" class="btn secondary">ホームに戻る</button>
                         <span>@smile study</span>
-                        <a href="#" id="privacy-link" style="color:#888; text-decoration:none; font-size:12px;">プライバシーポリシー</a>
+                        <span class="privacy-link">プライバシーポリシー</span>
                       </footer>
                     </div>
                 </div>
@@ -126,13 +206,60 @@
         </div>
     </div>
 
-    <div id="privacy-modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <div id="privacy-content"></div>
+    <!-- ▼ ここから変更: プライバシーポリシーのモーダル本体 -->
+    <div id="privacy-modal" class="privacy-modal-overlay">
+        <div class="privacy-modal-content">
+            <span class="privacy-modal-close-btn">&times;</span>
+            <div id="privacy-content">
+                <h2>情報の取り扱いについて（プライバシーポリシー）</h2>
+                
+                <p>本サービスで提供する「学力診断テスト」および「教材レコメンド」は、塾運営改善を目的としています。安心してご利用いただくため、お客様の情報の取り扱いについて以下に定めます。</p>
+                
+                <h3>1. 診断テストのデータについて</h3>
+                <p>お客様が<strong>学力診断テストで回答された内容、およびその診断結果は、当社のサーバー等には一切保存・記録されません。</strong><br>
+                診断結果は、現在お使いのブラウザ内でのみ一時的に計算・表示されるものです。ウェブサイトを離れたり、ブラウザを閉じたりした時点で、これらのデータは自動的に破棄されます。</p>
+
+                <h3>2. 個人情報の取得について</h3>
+                <p>当サービスのご利用にあたり、<strong>氏名、メールアドレス、住所、電話番号などの個人情報や、クレジットカード番号といった金融情報をご入力いただく必要は一切ありません。</strong><br>
+                当サービスは、お客様を特定できる個人情報を収集しない設計となっております。</p>
+
+                <h3>3. 免責事項</h3>
+                <p>当サービスで提供される情報や診断結果の正確性、完全性を保証するものではありません。当サービスの利用によって生じたいかなる損害についても、当方は一切の責任を負いません。</p>
+            </div>
         </div>
     </div>
+    <!-- ▲ ここまで変更 -->
+
+
+    <!-- ▼ プライバシーポリシーモーダルを動かすJavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 必要な要素を取得
+            const modal = document.getElementById('privacy-modal');
+            const links = document.querySelectorAll('.privacy-link');
+            const closeBtn = document.querySelector('.privacy-modal-close-btn');
+
+            // プライバシーポリシーのリンクがクリックされた時の処理
+            links.forEach(function(link) {
+                link.addEventListener('click', function() {
+                    modal.style.display = 'block';
+                });
+            });
+
+            // 閉じるボタンがクリックされた時の処理
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // モーダルの外側がクリックされた時の処理
+            window.addEventListener('click', function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <!-- ▲ JavaScriptここまで -->
+
 </body>
 </html>
-
-
