@@ -126,21 +126,109 @@ const allQuestionsData = { english: { 観点: ["単語・語彙", "文法(基礎
             document.getElementById('back-to-home-from-test').addEventListener('click', onBackToHome);
             resultTabsContainer.addEventListener('click', (e) => { if (e.target.matches('.tab-btn')) { const tabName = e.target.dataset.tab; resultTabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('#result-details .tab-content').forEach(content => content.classList.remove('active')); e.target.classList.add('active'); document.getElementById(`result-details-content-${tabName}`).classList.add('active'); } });
 
-            document.getElementById('print-results-btn').addEventListener('click', () => {
-                const chartContainer = document.querySelector('.chart-container');
-                const existingPrintImage = document.getElementById('chart-for-print');
-                if(existingPrintImage) { existingPrintImage.remove(); }
-                const chartImage = new Image();
-                chartImage.id = 'chart-for-print';
-                chartImage.src = myChart.toBase64Image();
-                chartContainer.appendChild(chartImage);
-                setTimeout(() => { window.print(); }, 100);
+            // ...initTestApp内の他のコードはそのまま...
+
+            document.getElementById('print-results-btn').addEventListener('click', (event) => {
+                const printButton = event.currentTarget;
+                const originalButtonText = printButton.textContent;
+                printButton.textContent = 'PDF生成中...';
+                printButton.disabled = true;
+
+                // --- ▼▼▼ ここからが新しい、最終確定版のロジックです ▼▼▼ ---
+
+                // 1. 【最重要】DOMを操作する前に、表示されているグラフを画像として取得
+                const chartImageBase64 = myChart.toBase64Image();
+
+                // 2. PDFに不要な要素を特定
+                const { jsPDF } = window.jspdf;
+                const elementToPrint = document.getElementById('result-screen');
+                const allTabContent = document.getElementById('result-details-content-all');
+                const correctTabContent = document.getElementById('result-details-content-correct');
+                const incorrectTabContent = document.getElementById('result-details-content-incorrect');
+                const onlyIncorrectCheckbox = document.getElementById('print-only-incorrect-cb');
+                const correctQuestionsInAllTab = document.querySelectorAll('#result-details-content-all .result-question-block:has(.user-answer-correct)');
+
+                // 3. PDF生成の準備（表示内容のフィルタリング）
+                const originalAllDisplayStyle = allTabContent.style.display;
+                const originalCorrectDisplayStyle = correctTabContent.style.display;
+                const originalIncorrectDisplayStyle = incorrectTabContent.style.display;
+                
+                allTabContent.style.display = 'block';
+                correctTabContent.style.display = 'none';
+                incorrectTabContent.style.display = 'none';
+
+                if (onlyIncorrectCheckbox.checked) {
+                    correctQuestionsInAllTab.forEach(q => q.classList.add('hide-for-pdf'));
+                }
+                
+                document.body.classList.add('print-mode');
+                
+                // 4. 僅かな待機後、PDF生成を開始
+                setTimeout(() => {
+                    html2canvas(elementToPrint, {
+                        scale: 2,
+                        useCORS: true,
+                        windowWidth: 720,
+                        onclone: (doc) => {
+                            // 5. 【最重要】クローンされた文書内で、グラフの<canvas>を、先ほど取得した静止画像<img>に置き換える
+                            const chartCanvas = doc.getElementById('resultChart');
+                            if (chartCanvas) {
+                                const img = doc.createElement('img');
+                                img.src = chartImageBase64;
+                                img.style.maxWidth = '100%';
+                                img.style.height = 'auto';
+                                // canvasをimgに差し替える
+                                chartCanvas.parentNode.replaceChild(img, chartCanvas);
+                            }
+                        }
+                    }).then(canvas => {
+                        // PDFの複数ページ分割ロジック（変更なし）
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const canvasWidth = canvas.width;
+                        const canvasHeight = canvas.height;
+                        const pdfPageWidth = pdf.internal.pageSize.getWidth();
+                        const pdfPageHeight = pdf.internal.pageSize.getHeight();
+                        const margin = 15;
+                        const imgWidth = pdfPageWidth - (margin * 2);
+                        const imgHeight = canvasHeight * imgWidth / canvasWidth;
+                        let heightLeft = imgHeight;
+                        let position = 0;
+
+                        pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
+                        heightLeft -= pdfPageHeight;
+
+                        while (heightLeft > 0) {
+                            position = position - pdfPageHeight;
+                            pdf.addPage();
+                            pdf.addImage(canvas, 'PNG', margin, position, imgWidth, imgHeight);
+                            heightLeft -= pdfPageHeight;
+                        }
+                        
+                        pdf.save('診断結果.pdf');
+
+                    }).catch(err => {
+                        console.error("PDFの生成に失敗しました:", err);
+                        alert("エラーが発生しました。PDFを生成できませんでした。");
+                    }).finally(() => {
+                        // 6. 後片付け処理（変更なし）
+                        document.body.classList.remove('print-mode');
+                        allTabContent.style.display = originalAllDisplayStyle;
+                        correctTabContent.style.display = originalCorrectDisplayStyle;
+                        incorrectTabContent.style.display = originalIncorrectDisplayStyle;
+                        
+                        if (onlyIncorrectCheckbox.checked) {
+                            correctQuestionsInAllTab.forEach(q => q.classList.remove('hide-for-pdf'));
+                        }
+                        
+                        printButton.textContent = originalButtonText;
+                        printButton.disabled = false;
+                    });
+                }, 100);
+
+                // --- ▲▲▲ ここまでが最終確定版のロジックです ▲▲▲ ---
             });
 
-            window.addEventListener('afterprint', () => {
-                const printImage = document.getElementById('chart-for-print');
-                if (printImage) { printImage.remove(); }
-            });
+            // ...initTestApp内の他のコードはそのまま...`
         }
         
         // MODIFIED: Replaced with the new recommendation logic
@@ -368,4 +456,5 @@ const allQuestionsData = { english: { 観点: ["単語・語彙", "文法(基礎
 
         function cardHTML(c) { return `<div class="card"><div>${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div><h3>${c.title}</h3>${c.why ? `<div class="why"><b>なぜ？</b> ${c.why}</div>` : ""}${c.tip ? `<div class="tip"><b>使い方のコツ</b>：${c.tip}</div>` : ""}</div>`; }
         function initPrivacyModal() { const modal = document.getElementById("privacy-modal"); const link = document.getElementById("privacy-link"); const closeBtn = document.querySelector("#privacy-modal .close-btn"); if(modal && link && closeBtn) { document.getElementById('privacy-content').innerHTML = privacyPolicyHTML; link.onclick = (e) => { e.preventDefault(); modal.style.display = "block"; }; closeBtn.onclick = () => { modal.style.display = "none"; }; window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; }; } }
+
 
