@@ -169,3 +169,78 @@
             .user-answer-correct { background-color: #e9f5ec !important; }
             .user-answer-wrong { background-color: #fbe9ea !important; }
         }
+/* ▼▼▼ PDF出力用のスタイル（複数ページ対応・レイアウト改善版）▼▼▼ */
+
+/* PDF生成中であることを示すクラス */
+body.print-mode {
+  background-color: #ffffff; /* 背景を白に固定 */
+}
+
+/* PDFに不要な要素（ボタン類）を非表示に */
+body.print-mode .btn-secondary,
+body.print-mode #print-results-btn,
+body.print-mode #result-tabs,
+body.print-mode #back-to-home-from-test,
+body.print-mode #back-to-home-from-rec {
+  display: none;
+}
+
+/* PDF出力のルート要素のスタイルを調整 */
+body.print-mode #result-screen {
+  box-shadow: none;
+  border: none;
+  /* 
+    【重要】PDF用の幅を定義します。
+    A4用紙の横幅は約210mmです。マージンを考慮し、
+    コンテンツが表示される幅を固定値で指定します。
+    これにより、極端に細長いレイアウトになるのを防ぎます。
+  */
+  width: 700px; /* PC画面で見るような適切な幅に固定 */
+  margin: 0 auto; /* 中央揃え */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 各セクションの上下に適切な余白を追加 */
+body.print-mode .result-summary,
+body.print-mode .result-details-container,
+body.print-mode .recommendations-container {
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+/* ページの切れ目で要素が分割されないようにする */
+body.print-mode .result-question-block,
+body.print-mode .card,
+body.print-mode .chart-container,
+body.print-mode .analysis-container,
+body.print-mode h2,
+body.print-mode h3 {
+  break-inside: avoid;
+}
+
+/* レーダーチャートと分析コメントのセクション */
+body.print-mode .result-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+body.print-mode .result-summary .chart-container {
+    flex: 1 1 300px; /* コンテナの幅に応じて伸縮 */
+}
+body.print-mode .result-summary .analysis-container {
+    flex: 1 1 350px;
+}
+
+/* 推奨教材も見やすく調整 */
+body.print-mode #recommended-books-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+/* ▲▲▲ ここまでを貼り付け ▲▲▲ */
+/* ▼▼▼ PDF生成時に一時的に非表示にするためのクラス ▼▼▼ */
+.hide-for-pdf {
+  display: none !important;
+}
