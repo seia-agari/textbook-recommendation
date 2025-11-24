@@ -107,9 +107,13 @@
                     <img src="https://smilestudy-kasukabe.com/wp-content/uploads/2025/10/Generated-Image-October-24-2025-2_20PM.jpg" alt="診断テストのイラスト">
                 </div>
                 <div class="selection-content">
-                    <h1>学力診断テスト</h1>
+                    <h1>体験授業診断テスト</h1>
                     <p>診断したい学年と科目を選んでください。</p>
                     <form id="start-test-form">
+                        <div class="form-group">
+                            <label for="student-name">受験者名:</label>
+                            <input type="text" id="student-name" name="student-name" placeholder="例：スマイル 太郎" required style="width: 100%; padding: 10px; font-size: 1rem; border-radius: 8px; border: 1px solid #e0e0e0;">
+                        </div>
                         <div class="form-group"><label for="grade">学年:</label><select id="grade" name="grade"><option value="1">中学1年生</option><option value="2">中学2年生</option><option value="3">中学3年生</option></select></div>
                         <div class="form-group"><label for="subject">科目:</label><select id="subject" name="subject"><option value="english">英語</option><option value="math">数学</option></select></div>
                         <button type="submit" class="btn">テストを開始</button>
@@ -180,6 +184,7 @@
         <label for="print-only-incorrect-cb">間違えた問題のみをPDFに出力する</label>
         </div>
          <!-- ▲▲▲ ここまで追加 ▲▲▲ -->
+                    <div id="notion-save-container" style="margin-bottom: 15px;"></div>
                     <button id="print-results-btn" class="btn">結果をPDFで保存/印刷</button>
                     <button id="back-to-home-from-test" class="btn secondary">ホームに戻る</button>
                 </div>
@@ -238,7 +243,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <!-- ▼ プライバシーポリシーモーダルを動かすJavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -271,4 +275,3 @@
 
 </body>
 </html>
-

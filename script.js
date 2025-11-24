@@ -140,7 +140,7 @@ const allQuestionsData = {
     ]
   }
 };
-const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマイルスタディ（以下「当塾」）は、本ページにおいて講師向けの教材選定情報を提供します。本ページは情報提供を目的としたものであり、以下のとおり利用者の個人情報を収集・利用いたしません。</p><p>1. 個人情報の収集について<br>本ページでは、利用者の氏名、メールアドレス、その他の個人情報を取得することはありません。</p><p>2. アクセス解析・クッキーの利用について<br>本ページでは、アクセス解析ツールやクッキー、その他のトラッキング技術を使用しておりません。</p><p>3. 外部サービスとの連携について<br>本ページでは、外部サービスとの連携や第三者への情報提供は行いません。</p><p>4. 免責事項<br>本ページの内容は、講師向けの教材選定の参考情報として提供しているものであり、内容の正確性や最新性を保証するものではありません。必要に応じて最新の公式情報をご確認ください。</p>`;
+        const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマイルスタディ（以下「当塾」）は、本ページにおいて講師向けの教材選定情報を提供します。本ページは情報提供を目的としたものであり、以下のとおり利用者の個人情報を収集・利用いたしません。</p><p>1. 個人情報の収集について<br>本ページでは、利用者の氏名、メールアドレス、その他の個人情報を取得することはありません。</p><p>2. アクセス解析・クッキーの利用について<br>本ページでは、アクセス解析ツールやクッキー、その他のトラッキング技術を使用しておりません。</p><p>3. 外部サービスとの連携について<br>本ページでは、外部サービスとの連携や第三者への情報提供は行いません。</p><p>4. 免責事項<br>本ページの内容は、講師向けの教材選定の参考情報として提供しているものであり、内容の正確性や最新性を保証するものではありません。必要に応じて最新の公式情報をご確認ください。</p>`;
         
         // MODIFIED: New decision tree and HS_LIB data
         const decisionTree = {
@@ -237,6 +237,7 @@ const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマ
             let userAnswers = [];
             let timerInterval = null;
             let currentQuestionIndex = 0;
+            let studentName = '';
 
             const prevBtn = document.getElementById('prev-question-btn');
             const nextBtn = document.getElementById('next-question-btn');
@@ -244,21 +245,175 @@ const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマ
             const testForm = document.getElementById('test-form');
             const resultTabsContainer = document.getElementById('result-tabs');
 
-            const saveCurrentAnswer = () => { if (!currentQuestions[currentQuestionIndex]) return; const q = currentQuestions[currentQuestionIndex]; let answer = ""; if (q.type === 'sort') { const inputEl = testForm.querySelector(`input[name="q${currentQuestionIndex}"]`); if (inputEl) answer = inputEl.value; } else { const selected = testForm.querySelector(`input[name="q${currentQuestionIndex}"]:checked`); if (selected) answer = selected.value; } userAnswers[currentQuestionIndex] = answer; };
+            const saveCurrentAnswer = () => { if (!currentQuestions[currentQuestionIndex]) return; const q = currentQuestions[currentQuestionIndex]; let answer = ""; if (q.type === 'sort') { const hiddenInput = testForm.querySelector(`input[name="q${currentQuestionIndex}"]`); if (hiddenInput) answer = hiddenInput.value; } else { const selected = testForm.querySelector(`input[name="q${currentQuestionIndex}"]:checked`); if (selected) answer = selected.value; } userAnswers[currentQuestionIndex] = answer; };
             const startTimer = () => { let timeLeft = 10 * 60; const timerEl = document.getElementById('timer'); timerEl.textContent = "10:00"; if (timerInterval) clearInterval(timerInterval); timerInterval = setInterval(() => { if (timeLeft <= 0) { clearInterval(timerInterval); alert("時間切れです！自動的に採点します。"); submitTest(); } else { timeLeft--; const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60; timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`; } }, 1000); };
             const stopTimer = () => { clearInterval(timerInterval); timerInterval = null; };
-            const displayQuestion = (index) => { const q = currentQuestions[index]; let questionHTML = ''; if (q.c === '長文読解' && q.q.includes('\n')) { const parts = q.q.split('\n'); const passage = parts.slice(0, -1).join('\n'); const question = parts.slice(-1)[0]; questionHTML += `<div class="long-text-question">${passage}</div><p class="question-text">${question}</p>`; } else { questionHTML += `<p class="question-text">${q.q}</p>`; } questionHTML += `<div class="options">`; if (q.type === 'sort') { questionHTML += `<input type="text" name="q${index}" placeholder="単語をスペースで区切って入力" value="${userAnswers[index] || ''}">`; } else { q.options.forEach(option => { const escapedOption = option.replace(/"/g, '&quot;'); const isChecked = userAnswers[index] === option ? 'checked' : ''; questionHTML += `<label><input type="radio" name="q${index}" value="${escapedOption}" ${isChecked}> ${option}</label>`; }); } questionHTML += `</div>`; testForm.innerHTML = questionHTML; document.getElementById('progress-text').innerText = `問題 ${index + 1} / ${currentQuestions.length}`; document.getElementById('test-progress-bar').style.width = `${((index + 1) / currentQuestions.length) * 100}%`; prevBtn.disabled = index === 0; nextBtn.style.display = index === currentQuestions.length - 1 ? 'none' : 'inline-block'; submitBtn.style.display = index === currentQuestions.length - 1 ? 'inline-block' : 'none'; };
+            const displayQuestion = (index) => { 
+                const q = currentQuestions[index]; 
+                let questionHTML = ''; 
+                if (q.c === '長文読解' && q.q.includes('\n')) { 
+                    const parts = q.q.split('\n'); 
+                    const passage = parts.slice(0, -1).join('\n'); 
+                    const question = parts.slice(-1)[0]; 
+                    questionHTML += `<div class="long-text-question">${passage}</div><p class="question-text">${question}</p>`; 
+                } else { 
+                    questionHTML += `<p class="question-text">${q.q}</p>`; 
+                } 
+                questionHTML += `<div class="options">`; 
+                if (q.type === 'sort') {
+                    // 括弧内の単語を抽出
+                    const match = q.q.match(/\(([^)]+)\)/);
+                    const words = match ? match[1].split('/').map(w => w.trim()) : [];
+                    const savedAnswer = userAnswers[index] || '';
+                    const savedWords = savedAnswer ? savedAnswer.split(' ').filter(w => w.trim()).map(w => w.trim().toLowerCase()) : [];
+                    
+                    // 保存された回答の単語を除外した残りの単語（大文字小文字を無視して比較）
+                    const remainingWords = words.filter(word => {
+                        const wordLower = word.toLowerCase();
+                        return !savedWords.some(saved => saved === wordLower);
+                    });
+                    
+                    // 保存された単語を元の単語リストから見つける
+                    const savedWordsInOriginal = savedWords.map(saved => {
+                        const found = words.find(w => w.toLowerCase() === saved);
+                        return found || saved;
+                    });
+                    
+                    questionHTML += `
+                        <div class="sortable-options" id="q${index}-options">
+                            ${remainingWords.map(word => `<span class="sortable-option" data-word="${word}">${word}</span>`).join('')}
+                        </div>
+                        <div class="sortable-answer-area" id="q${index}-answer">
+                            ${savedWordsInOriginal.map(word => `<span class="sortable-option" data-word="${word}">${word}</span>`).join('')}
+                        </div>
+                        <input type="hidden" name="q${index}" value="${savedAnswer}">
+                    `;
+                } else { 
+                    q.options.forEach(option => { 
+                        const escapedOption = option.replace(/"/g, '&quot;'); 
+                        const isChecked = userAnswers[index] === option ? 'checked' : ''; 
+                        questionHTML += `<label><input type="radio" name="q${index}" value="${escapedOption}" ${isChecked}> ${option}</label>`; 
+                    }); 
+                } 
+                questionHTML += `</div>`; 
+                testForm.innerHTML = questionHTML; 
+                
+                // 並び替え問題のイベントリスナーを設定
+                if (q.type === 'sort') {
+                    const optionsContainer = document.getElementById(`q${index}-options`);
+                    const answerContainer = document.getElementById(`q${index}-answer`);
+                    const hiddenInput = testForm.querySelector(`input[name="q${index}"]`);
+                    
+                    if (optionsContainer && answerContainer && hiddenInput) {
+                        optionsContainer.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('sortable-option')) {
+                                answerContainer.appendChild(e.target);
+                                updateSortableAnswer();
+                            }
+                        });
+                        
+                        answerContainer.addEventListener('click', (e) => {
+                            if (e.target.classList.contains('sortable-option')) {
+                                optionsContainer.appendChild(e.target);
+                                updateSortableAnswer();
+                            }
+                        });
+                        
+                        function updateSortableAnswer() {
+                            const words = Array.from(answerContainer.children).map(child => child.textContent.trim());
+                            hiddenInput.value = words.join(' ');
+                            userAnswers[index] = hiddenInput.value;
+                        }
+                    }
+                }
+                
+                document.getElementById('progress-text').innerText = `問題 ${index + 1} / ${currentQuestions.length}`; 
+                document.getElementById('test-progress-bar').style.width = `${((index + 1) / currentQuestions.length) * 100}%`; 
+                prevBtn.disabled = index === 0; 
+                nextBtn.style.display = index === currentQuestions.length - 1 ? 'none' : 'inline-block'; 
+                submitBtn.style.display = index === currentQuestions.length - 1 ? 'inline-block' : 'none'; 
+            };
             const calculateResult = (grade, subject, answers) => { const questions = allQuestionsData[subject][`grade${grade}`]; const data = allQuestionsData[subject]; const categories = data['観点']; let total_score = 0; const score_by_category = Object.fromEntries(categories.map(cat => [cat, 0])); const total_by_category = Object.fromEntries(categories.map(cat => [cat, 0])); questions.forEach((q, i) => { if (categories.includes(q.c)) { total_by_category[q.c]++; let userAnswer = (answers[i] || "").trim().toLowerCase().replace(/[.?!,]/g, ""); let correctAnswer = q.a.trim().toLowerCase().replace(/[.?!,]/g, ""); if (userAnswer === correctAnswer) { score_by_category[q.c]++; total_score++; } } }); const user_scores = categories.map(cat => Math.round(total_by_category[cat] > 0 ? (score_by_category[cat] / total_by_category[cat]) * 100 : 0)); const final_score_100 = total_score * 5; let comment = ''; if (final_score_100 >= 80) { comment += '<strong>【総評】素晴らしい結果です！</strong><br>基礎力は十分に身についています。この調子で応用問題にも挑戦し、更なるレベルアップを目指しましょう。<br><br>'; } else if (final_score_100 >= 60) { comment += '<strong>【総評】良い結果です！</strong><br>全体的に理解できていますが、いくつか苦手な分野があるようです。弱点を克服すれば、さらに高得点が狙えます。<br><br>'; } else if (final_score_100 >= 40) { comment += '<strong>【総評】もう少し頑張りましょう。</strong><br>苦手な分野がいくつか見られます。まずは基本的な知識を確実に定着させることが大切です。<br><br>'; } else { comment += '<strong>【総評】基礎からしっかり復習しましょう。</strong><br>今回の範囲の基礎固めが急務です。焦らず、一つ一つの単元を丁寧に学び直すことから始めましょう。<br><br>'; } const strong_points = categories.filter((cat, i) => user_scores[i] > data.平均[i]); if (strong_points.length > 0) { comment += `<strong>【得意な分野】</strong><br>特に「${strong_points.join("」「")}」は平均を上回っており、得意分野と言えるでしょう。自信を持ってください。<br><br>`; } const weak_points = categories.filter((cat, i) => user_scores[i] < data.平均[i]); if (weak_points.length > 0) { comment += `<strong>【要改善点】</strong><br>今回のテストでは、特に「${weak_points.join("」「")}」に課題が見られました。おすすめの教材などを活用して集中的に復習し、苦手を克服しましょう。`; } else { comment += '<strong>【要改善点】</strong><br>特に苦手な分野は見当たりませんでした。素晴らしいです！全体的にレベルアップできるよう、応用問題に取り組んでみましょう。'; } return { total_score, categories, user_scores, avg_scores: data.平均, analysis_comment: comment, weak_points }; };
             const renderChart = (resultData) => { const ctx = document.getElementById('resultChart').getContext('2d'); if (myChart) myChart.destroy(); myChart = new Chart(ctx, { type: 'radar', data: { labels: resultData.categories, datasets: [ { label: 'あなたの得点率 (%)', data: resultData.user_scores, backgroundColor: 'rgba(245, 158, 11, 0.2)', borderColor: 'rgba(245, 158, 11, 1)', borderWidth: 2 }, { label: '平均得点率 (%)', data: resultData.avg_scores, backgroundColor: 'rgba(34, 197, 94, 0.2)', borderColor: 'rgba(34, 197, 94, 1)', borderWidth: 2 } ] }, options: { scales: { r: { suggestedMin: 0, suggestedMax: 100, pointLabels: { color: '#1a202c', font: { size: 12, weight: '600' } }, grid: { color: 'rgba(0, 0, 0, 0.05)' }, angleLines: { color: 'rgba(0, 0, 0, 0.05)' } } } } }); };
             const displayResultDetails = (grade, subject, answers) => { const questions = allQuestionsData[subject][`grade${grade}`]; let allHtml = '', correctHtml = '', incorrectHtml = ''; questions.forEach((q, i) => { const userAnswer = answers[i] || ""; const isCorrect = userAnswer.trim().toLowerCase().replace(/[.?!,]/g, "") === q.a.trim().toLowerCase().replace(/[.?!,]/g, ""); let content = ''; if (q.type === 'sort') { content = `<div class="user-answer ${isCorrect ? 'user-answer-correct' : 'user-answer-wrong'}">あなたの答え: ${userAnswer || "無回答"}</div>`; if (!isCorrect) content += `<div class="correct-answer">正解: ${q.a}</div>`; } else { content = q.options.map(option => { let classStr = '', correctAnswerHtml = ''; if (option === userAnswer) classStr = isCorrect ? 'user-answer-correct' : 'user-answer-wrong'; if (!isCorrect && option === q.a) correctAnswerHtml = ` <span class="correct-answer">(正解)</span>`; return `<label class="${classStr}">${option}${correctAnswerHtml}</label>`; }).join(''); } const questionBlockHtml = `<div class="result-question-block"><p>${q.q.replace(/\n/g, "<br>")}</p><div class="result-options">${content}</div></div>`; allHtml += questionBlockHtml; if (isCorrect) correctHtml += questionBlockHtml; else incorrectHtml += questionBlockHtml; }); document.getElementById('result-details-content-all').innerHTML = allHtml || "<p>表示する問題がありません。</p>"; document.getElementById('result-details-content-correct').innerHTML = correctHtml || "<p>正解した問題はありませんでした。</p>"; document.getElementById('result-details-content-incorrect').innerHTML = incorrectHtml || "<p>素晴らしい！不正解の問題はありませんでした。</p>"; resultTabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('#result-details .tab-content').forEach(content => content.classList.remove('active')); resultTabsContainer.querySelector('.tab-btn[data-tab="all"]').classList.add('active'); document.getElementById('result-details-content-all').classList.add('active'); };
             const isBookForGrade = (book, studentGrade) => { const gradeNum = parseInt(studentGrade, 10); if (!book.tags || book.tags.length === 0) return true; let hasGradeTag = false; for (const tag of book.tags) { const rangeMatch = tag.match(/中(\d)-中(\d)/); if (rangeMatch) { hasGradeTag = true; if (gradeNum >= parseInt(rangeMatch[1], 10) && gradeNum <= parseInt(rangeMatch[2], 10)) return true; } const singleMatch = tag.match(/中(\d)/); if (singleMatch && !rangeMatch) { hasGradeTag = true; if (gradeNum >= parseInt(singleMatch[1], 10)) return true; } } return !hasGradeTag; };
             const displayRecommendations = (weakPoints, subject, grade) => { const mapping = { english: { "単語・語彙": ["jhs-eng-vocab-basic", "jhs-eng-vocab-standard"], "文法(基礎)": ["jhs-eng-grammar-basic"], "文法(応用)": ["jhs-eng-grammar-practice"], "並び替え": ["jhs-eng-grammar-practice"], "長文読解": ["jhs-eng-reading-basic"], "対話文": ["jhs-eng-grammar-basic"] }, math: { "数と計算": ["jhs-math-calc"], "方程式": ["jhs-math-text"], "図形": ["jhs-math-text"], "資料の活用": ["jhs-math-text"], "関数": ["jhs-math-text"]} }; const recommendedKeys = new Set(); weakPoints.forEach(point => { mapping[subject]?.[point]?.forEach(key => recommendedKeys.add(key)); }); const addedTitles = new Set(); const finalBooks = []; recommendedKeys.forEach(key => { (decisionTree.results[key] || []).filter(book => isBookForGrade(book, grade)).forEach(book => { if (!addedTitles.has(book.title)) { finalBooks.push(book); addedTitles.add(book.title); } }); }); const limitedBooks = finalBooks.slice(0, 3); const container = document.getElementById('recommended-books-results'); container.innerHTML = limitedBooks.length > 0 ? limitedBooks.map(cardHTML).join('') : `<p>あなたの弱点を補う、最適な教材は見つかりませんでした。まずは教科書や基本的な問題集で復習してみましょう。</p>`; };
-            const submitTest = () => { saveCurrentAnswer(); stopTimer(); const resultData = calculateResult(currentTestInfo.grade, currentTestInfo.subject, userAnswers); document.getElementById('total-score').innerText = `あなたの得点: ${resultData.total_score * 5} / 100点`; renderChart(resultData); document.getElementById('analysis-comment').innerHTML = resultData.analysis_comment; displayResultDetails(currentTestInfo.grade, currentTestInfo.subject, userAnswers); displayRecommendations(resultData.weak_points, currentTestInfo.subject, currentTestInfo.grade); screenManager.showScreen('result'); };
+            const submitTest = () => { 
+                saveCurrentAnswer(); 
+                stopTimer(); 
+                const resultData = calculateResult(currentTestInfo.grade, currentTestInfo.subject, userAnswers); 
+                document.getElementById('total-score').innerText = `あなたの得点: ${resultData.total_score * 5} / 100点`; 
+                renderChart(resultData); 
+                document.getElementById('analysis-comment').innerHTML = resultData.analysis_comment; 
+                displayResultDetails(currentTestInfo.grade, currentTestInfo.subject, userAnswers); 
+                displayRecommendations(resultData.weak_points, currentTestInfo.subject, currentTestInfo.grade); 
+                saveToNotion(resultData, currentTestInfo, userAnswers);
+                screenManager.showScreen('result'); 
+            };
+            
+            const saveToNotion = (resultData, testInfo, answers) => {
+                // GASウェブアプリのURL（math_15.htmlと同じものを使用）
+                const gasWebAppUrl = "https://script.google.com/macros/s/AKfycbw8FqtinnPbd9kXhgz32L4QKeifyYX-drtkQLHjEdKQdUXz7USyRdwraX6QOlLZeYlZDQ/exec";
+                
+                const subjectText = testInfo.subject === 'english' ? '英語' : '数学';
+                const testName = `体験授業診断テスト - 中学${testInfo.grade}年生 ${subjectText}`;
+                const finalScore = resultData.total_score * 5;
+                const totalQuestions = currentQuestions.length;
+                const correctCount = resultData.total_score;
+                
+                // 不正解の問題リストを作成（math_15.htmlと同じ形式）
+                const questions = allQuestionsData[testInfo.subject][`grade${testInfo.grade}`];
+                const incorrectQuestions = [];
+                questions.forEach((q, i) => {
+                    const userAnswer = (answers[i] || "").trim().toLowerCase().replace(/[.?!,]/g, "");
+                    const correctAnswer = q.a.trim().toLowerCase().replace(/[.?!,]/g, "");
+                    if (userAnswer !== correctAnswer) {
+                        incorrectQuestions.push(`Q${i + 1}: ${q.q}`);
+                    }
+                });
+                const incorrectsText = incorrectQuestions.length > 0 ? incorrectQuestions.join('\n') : '全問正解';
+                
+                // Notionに送信するパラメータを構築（math_15.htmlと同じシンプルな形式）
+                const params = new URLSearchParams({
+                    testName: testName,
+                    score: finalScore,
+                    correctCount: correctCount,
+                    totalQuestions: totalQuestions,
+                    studentName: studentName,
+                    incorrects: incorrectsText
+                });
+                
+                const saveUrl = `${gasWebAppUrl}?${params.toString()}`;
+                
+                // Notion保存ボタンを表示
+                const notionContainer = document.getElementById('notion-save-container');
+                if (notionContainer) {
+                    notionContainer.innerHTML = `
+                        <a href="${saveUrl}" target="_blank" class="btn" style="font-size: 1rem; text-decoration: none; padding: 12px 30px; display: inline-block; background: #10B981;">
+                            結果をNotionに記録する
+                        </a>
+                    `;
+                }
+            };
 
             document.getElementById('start-test-form').addEventListener('submit', (e) => {
-                e.preventDefault(); currentTestInfo = { grade: document.getElementById('grade').value, subject: document.getElementById('subject').value }; currentQuestions = allQuestionsData[currentTestInfo.subject][`grade${currentTestInfo.grade}`]; userAnswers = new Array(currentQuestions.length).fill(''); currentQuestionIndex = 0;
-                const subjectText = currentTestInfo.subject === 'english' ? '英語' : '数学'; document.getElementById('test-title').innerText = `診断テスト - 中学${currentTestInfo.grade}年生 ${subjectText}`;
-                displayQuestion(0); startTimer(); screenManager.showScreen('test');
+                e.preventDefault(); 
+                const nameInput = document.getElementById('student-name');
+                studentName = nameInput.value.trim();
+                if (studentName === '') {
+                    alert('受験者名を入力してください。');
+                    nameInput.focus();
+                    return;
+                }
+                currentTestInfo = { grade: document.getElementById('grade').value, subject: document.getElementById('subject').value }; 
+                currentQuestions = allQuestionsData[currentTestInfo.subject][`grade${currentTestInfo.grade}`]; 
+                userAnswers = new Array(currentQuestions.length).fill(''); 
+                currentQuestionIndex = 0;
+                const subjectText = currentTestInfo.subject === 'english' ? '英語' : '数学'; 
+                document.getElementById('test-title').innerText = `体験授業診断テスト - 中学${currentTestInfo.grade}年生 ${subjectText}`;
+                displayQuestion(0); 
+                startTimer(); 
+                screenManager.showScreen('test');
             });
             
             nextBtn.addEventListener('click', () => { saveCurrentAnswer(); if (currentQuestionIndex < currentQuestions.length - 1) { currentQuestionIndex++; displayQuestion(currentQuestionIndex); } });
@@ -267,7 +422,7 @@ const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマ
             document.getElementById('back-to-home-from-test').addEventListener('click', onBackToHome);
             resultTabsContainer.addEventListener('click', (e) => { if (e.target.matches('.tab-btn')) { const tabName = e.target.dataset.tab; resultTabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('#result-details .tab-content').forEach(content => content.classList.remove('active')); e.target.classList.add('active'); document.getElementById(`result-details-content-${tabName}`).classList.add('active'); } });
 
-            // ...initTestApp内の他のコードはそのまま...
+          // ...initTestApp内の他のコードはそのまま...
 
             document.getElementById('print-results-btn').addEventListener('click', (event) => {
                 const printButton = event.currentTarget;
@@ -597,6 +752,3 @@ const privacyPolicyHTML = `<h4>プライバシーポリシー</h4><p>1対1スマ
 
         function cardHTML(c) { return `<div class="card"><div>${(c.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div><h3>${c.title}</h3>${c.why ? `<div class="why"><b>なぜ？</b> ${c.why}</div>` : ""}${c.tip ? `<div class="tip"><b>使い方のコツ</b>：${c.tip}</div>` : ""}</div>`; }
         function initPrivacyModal() { const modal = document.getElementById("privacy-modal"); const link = document.getElementById("privacy-link"); const closeBtn = document.querySelector("#privacy-modal .close-btn"); if(modal && link && closeBtn) { document.getElementById('privacy-content').innerHTML = privacyPolicyHTML; link.onclick = (e) => { e.preventDefault(); modal.style.display = "block"; }; closeBtn.onclick = () => { modal.style.display = "none"; }; window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; }; } }
-
-
-
